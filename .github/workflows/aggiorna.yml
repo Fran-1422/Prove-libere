@@ -2,8 +2,8 @@ name: Aggiorna date
 
 on:
   schedule:
-    - cron: "0 5 * * *"   # ogni giorno alle 05:00 UTC (06:00 o 07:00 in Italia)
-  workflow_dispatch:       # avvio manuale dal pulsante "Run workflow"
+    - cron: "0 5 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
