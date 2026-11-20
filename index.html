@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario Prove Libere</title>
+<meta name="theme-color" content="#0b6e8a">
+<meta name="description" content="Date delle prove libere moto per circuito e organizzatore.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prove Libere">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #edf0f3; --surface: #ffffff; --surface-2: #f5f7f9; --fg: #131d27; --muted: #556473; --line: #d3dae1;
+  --accent: #0b6e8a; --accent-fg: #ffffff; --warn: #8a5a00; --bad: #a32035;
+  --o-rf: #0b6e8a; --o-gully: #6b4fc0; --o-promo: #b45309; --o-rosso: #b3263e; --o-cremona: #2f7d32; --o-altro: #556473;
+  --f-head: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e151b; --surface: #16202a; --surface-2: #1c2834; --fg: #e8edf2; --muted: #9aa9b8; --line: #2b3a48;
+    --accent: #4cc0e0; --accent-fg: #07222b; --warn: #f0c36a; --bad: #f07a8e;
+    --o-rf: #4cc0e0; --o-gully: #a994ee; --o-promo: #f0a24a; --o-rosso: #f07a8e; --o-cremona: #7fd283; --o-altro: #9aa9b8;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-top: max(24px, env(safe-area-inset-top, 0px)); padding-bottom: max(48px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.top { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+h1 { font-family: var(--f-head); font-weight: 700; font-size: clamp(1.6rem, 4.5vw, 2.3rem); line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-family: var(--f-head); font-weight: 700; font-size: 1.05rem; margin: 0; }
+.sub { color: var(--muted); margin: 6px 0 0; font-size: 0.9rem; }
+.label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.chip { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; min-height: 34px; }
+.chip .n { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: 0.85; }
+.chip.zero { border-style: dashed; color: var(--muted); }
+.chip:focus-visible, .seg button:focus-visible, .nav button:focus-visible, .refresh:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c, var(--muted)); flex: none; }
+.chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px var(--accent-fg); }
+.bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 7px 16px; min-height: 36px; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.count { color: var(--muted); font-size: 0.9rem; }
+.refresh { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; min-height: 40px; font-weight: 600; display: inline-flex; gap: 8px; align-items: center; }
+.refresh[disabled] { opacity: 0.6; cursor: default; }
+.refresh svg { width: 16px; height: 16px; }
+.refresh.spin svg { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.status { font-size: 0.85rem; color: var(--muted); }
+.status.err { color: var(--bad); }
+.banner { border: 1px solid var(--warn); border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; background: var(--surface); }
+.empty { border: 1px dashed var(--line); border-radius: 8px; padding: 22px 16px; color: var(--muted); background: var(--surface); }
+.month { display: flex; flex-direction: column; gap: 8px; }
+.month > h2 { text-transform: capitalize; padding-bottom: 6px; border-bottom: 2px solid var(--fg); display: flex; justify-content: space-between; align-items: baseline; }
+.month > h2 span { font-family: var(--f-body); font-weight: 400; font-size: 0.85rem; color: var(--muted); }
+.row { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.date { font-family: var(--f-mono); line-height: 1.2; }
+.date b { font-size: 1.15rem; display: block; font-weight: 500; }
+.date small { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.what { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.what strong { font-family: var(--f-head); font-size: 1.05rem; }
+.what strong i { font-style: normal; font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted); margin-left: 6px; font-weight: 500; }
+.meta { color: var(--muted); font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.org { display: inline-flex; align-items: center; gap: 6px; color: var(--fg); font-weight: 500; }
+.book { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.price { font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.btn { display: inline-block; text-decoration: none; background: var(--accent); color: var(--accent-fg); border-radius: 6px; padding: 8px 14px; font-weight: 600; font-size: 0.88rem; }
+.nav { display: flex; align-items: center; gap: 10px; }
+.nav button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; width: 40px; height: 40px; font-size: 1.1rem; }
+.nav button:disabled { opacity: 0.35; cursor: default; }
+.nav h2 { text-transform: capitalize; min-width: 9ch; text-align: center; font-size: 1.15rem; }
+.gridwrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); min-width: 640px; }
+.dow { padding: 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.cell { min-height: 92px; padding: 6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cell:nth-child(7n) { border-right: 0; }
+.cell.out { background: var(--surface-2); }
+.cell .d { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.cell.today .d { color: var(--accent); font-weight: 700; }
+.pill { display: flex; align-items: center; gap: 5px; text-decoration: none; color: var(--fg); font-size: 0.74rem; line-height: 1.2; padding: 3px 5px; border-radius: 4px; background: color-mix(in srgb, var(--c) 16%, var(--surface)); min-width: 0; }
+.pill span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.tw { overflow-x: auto; }
+.st { font-family: var(--f-mono); font-size: 0.75rem; white-space: nowrap; }
+.st.ok { color: var(--accent); } .st.vuoto { color: var(--muted); } .st.da_controllare, .st.errore { color: var(--warn); }
+a { color: var(--accent); }
+.install { font-size: 0.88rem; color: var(--muted); }
+.install button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; margin-right: 8px; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: 78px minmax(0, 1fr); }
+  .book { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+}
+@media (prefers-reduced-motion: reduce) { .refresh.spin svg { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Calendario prove libere moto</h1>
+      <p class="sub" id="sub">Caricamento delle date…</p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <button class="refresh" id="refresh" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+        Aggiorna
+      </button>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <div id="banner"></div>
+
+  <section class="panel" aria-label="Filtri">
+    <div><div class="label">Circuito</div><div class="chips" id="fc"></div></div>
+    <div><div class="label">Organizzatore</div><div class="chips" id="fo"></div></div>
+  </section>
+
+  <div class="bar">
+    <div class="count" id="count" aria-live="polite"></div>
+    <div class="seg" role="group" aria-label="Vista">
+      <button id="vl" type="button" aria-pressed="true">Lista</button>
+      <button id="vm" type="button" aria-pressed="false">Mese</button>
+    </div>
+  </div>
+
+  <main id="out"></main>
+
+  <section class="panel" aria-label="Fonti">
+    <h2>Fonti controllate</h2>
+    <div class="tw"><table id="src"></table></div>
+  </section>
+
+  <p class="install" id="install"></p>
+</div>
+
+<script>
+"use strict";
+const MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+const GIORNI = ["dom","lun","mar","mer","gio","ven","sab"];
+const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "altro"];
+const STATO = { ok: "ok", vuoto: "nessuna data", da_controllare: "da controllare", errore: "errore" };
+
+let DATA = { events: [], circuits: [], orgs: {}, sources: [] };
+const state = { circuits: new Set(), orgs: new Set(), view: "list", ym: null };
+const $ = (id) => document.getElementById(id);
+const parse = (s) => new Date(s + "T00:00:00");
+const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const safeUrl = (u) => /^https?:\/\//i.test(u) ? u : "#";
+const orgColor = (o) => "var(--o-" + (KNOWN_ORGS.includes(o) ? o : "altro") + ")";
+const orgName = (o) => DATA.orgs[o] || o;
+const circ = (id) => DATA.circuits.find((c) => c.id === id) || { id, name: id, country: "" };
+
+function filtered() {
+  return DATA.events.filter((e) => (!state.circuits.size || state.circuits.has(e.circuit)) && (!state.orgs.size || state.orgs.has(e.org)))
+    .sort((a, b) => a.start.localeCompare(b.start));
+}
+
+function chip(label, pressed, n, onClick, color) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "chip" + (n === 0 ? " zero" : "");
+  b.setAttribute("aria-pressed", pressed ? "true" : "false");
+  b.innerHTML = (color ? '<span class="dot" style="--c:' + color + '"></span>' : "") + esc(label) + ' <span class="n">' + n + "</span>";
+  if (n === 0) b.title = "Nessuna data pubblicata";
+  b.addEventListener("click", onClick);
+  return b;
+}
+
+function renderFilters() {
+  const fc = $("fc"); fc.replaceChildren();
+  fc.append(chip("Tutti", state.circuits.size === 0, DATA.events.length, () => { state.circuits.clear(); render(); }));
+  DATA.circuits.forEach((c) => {
+    const n = DATA.events.filter((e) => e.circuit === c.id).length;
+    fc.append(chip(c.name + (c.country ? " · " + c.country : ""), state.circuits.has(c.id), n, () => {
+      state.circuits.has(c.id) ? state.circuits.delete(c.id) : state.circuits.add(c.id); render();
+    }));
+  });
+  const fo = $("fo"); fo.replaceChildren();
+  const orgs = [...new Set([...Object.keys(DATA.orgs), ...DATA.events.map((e) => e.org)])].filter((o) => o !== "altro" || DATA.events.some((e) => e.org === "altro"));
+  fo.append(chip("Tutti", state.orgs.size === 0, DATA.events.length, () => { state.orgs.clear(); render(); }));
+  orgs.forEach((o) => {
+    const n = DATA.events.filter((e) => e.org === o).length;
+    fo.append(chip(orgName(o), state.orgs.has(o), n, () => {
+      state.orgs.has(o) ? state.orgs.delete(o) : state.orgs.add(o); render();
+    }, orgColor(o)));
+  });
+}
+
+function dateBlock(e) {
+  const a = parse(e.start), b = parse(e.end), same = e.start === e.end;
+  const main = same ? a.getDate() : a.getDate() + "–" + b.getDate() + (a.getMonth() !== b.getMonth() ? " " + MESI[b.getMonth()].slice(0, 3) : "");
+  const small = same ? GIORNI[a.getDay()] : GIORNI[a.getDay()] + "–" + GIORNI[b.getDay()];
+  return '<div class="date"><b>' + esc(main) + "</b><small>" + small + "</small></div>";
+}
+
+function emptyMsg() {
+  const names = [...state.circuits].map((id) => circ(id).name);
+  let m = "Nessuna data con questi filtri.";
+  if (names.length) m = "Nessuna data pubblicata per " + names.join(", ") + (state.orgs.size ? " con gli organizzatori scelti" : "") + ". Gli organizzatori non ne hanno ancora caricate.";
+  return '<div class="empty">' + esc(m) + "</div>";
+}
+
+function renderList(list) {
+  if (!list.length) return emptyMsg();
+  const groups = new Map();
+  list.forEach((e) => { const k = e.start.slice(0, 7); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+  let h = "";
+  groups.forEach((items, k) => {
+    const [y, m] = k.split("-").map(Number);
+    h += '<section class="month"><h2>' + MESI[m - 1] + " " + y + "<span>" + items.length + (items.length === 1 ? " data" : " date") + "</span></h2>";
+    items.forEach((e) => {
+      const c = circ(e.circuit);
+      h += '<article class="row">' + dateBlock(e) +
+        '<div class="what"><strong>' + esc(c.name) + (c.country ? "<i>" + esc(c.country) + "</i>" : "") + "</strong>" +
+        '<div class="meta"><span class="org"><span class="dot" style="--c:' + orgColor(e.org) + '"></span>' + esc(orgName(e.org)) + "</span>" +
+        (e.note ? "<span>" + esc(e.note) + "</span>" : "") + "</div></div>" +
+        '<div class="book"><span class="price">' + esc(e.price || "Prezzo sul sito") + '</span><a class="btn" href="' + esc(safeUrl(e.url)) + '" target="_blank" rel="noopener">Dettagli</a></div></article>';
+    });
+    h += "</section>";
+  });
+  return h;
+}
+
+function curKey() { return state.ym.y + "-" + String(state.ym.m + 1).padStart(2, "0"); }
+
+function renderMonth(list) {
+  if (!state.ym) {
+    const base = list[0] ? parse(list[0].start) : new Date();
+    state.ym = { y: base.getFullYear(), m: base.getMonth() };
+  }
+  const { y, m } = state.ym;
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+  const days = new Date(y, m + 1, 0).getDate();
+  const todayIso = iso(new Date());
+  let cells = "";
+  ["lun","mar","mer","gio","ven","sab","dom"].forEach((d) => { cells += '<div class="dow">' + d + "</div>"; });
+  const total = Math.ceil((offset + days) / 7) * 7;
+  for (let i = 0; i < total; i++) {
+    const d = new Date(y, m, 1 - offset + i), di = iso(d);
+    const evs = list.filter((e) => e.start <= di && di <= e.end);
+    cells += '<div class="cell' + (d.getMonth() !== m ? " out" : "") + (di === todayIso ? " today" : "") + '"><span class="d">' + d.getDate() + "</span>" +
+      evs.map((e) => '<a class="pill" style="--c:' + orgColor(e.org) + '" href="' + esc(safeUrl(e.url)) + '" target="_blank" rel="noopener" title="' +
+        esc(circ(e.circuit).name + " · " + orgName(e.org)) + '"><span class="dot" style="--c:' + orgColor(e.org) + '"></span><span>' + esc(circ(e.circuit).name) + "</span></a>").join("") + "</div>";
+  }
+  const months = [...new Set(list.flatMap((e) => [e.start.slice(0, 7), e.end.slice(0, 7)]))].sort();
+  const cur = curKey();
+  const inMonth = months.includes(cur);
+  return '<div class="nav"><button id="pm" type="button" aria-label="Mese precedente"' + (months.some((x) => x < cur) ? "" : " disabled") + '>‹</button><h2>' + MESI[m] + " " + y +
+    '</h2><button id="nm" type="button" aria-label="Mese successivo"' + (months.some((x) => x > cur) ? "" : " disabled") + ">›</button></div>" +
+    '<div class="gridwrap"><div class="grid">' + cells + "</div></div>" +
+    (list.length ? (inMonth ? "" : '<div class="empty">Nessuna data in questo mese. Usa le frecce per vedere i mesi con eventi.</div>') : emptyMsg());
+}
+
+function jump(dir, list) {
+  const cur = curKey();
+  const months = [...new Set(list.flatMap((e) => [e.start.slice(0, 7), e.end.slice(0, 7)]))].sort();
+  const t = dir > 0 ? months.find((x) => x > cur) : [...months].reverse().find((x) => x < cur);
+  if (t) { const [y, m] = t.split("-").map(Number); state.ym = { y, m: m - 1 }; }
+}
+
+function renderSources() {
+  const rows = (DATA.sources || []).map((s) =>
+    "<tr><td><a href=\"" + esc(safeUrl(s.url)) + '" target="_blank" rel="noopener">' + esc(s.name) + "</a></td><td>" +
+    esc(s.message || (s.status === "ok" ? "Letto correttamente." : "")) + '</td><td class="st ' + esc(s.status) + '">' +
+    esc(STATO[s.status] || s.status) + " · " + s.count + "</td></tr>").join("");
+  $("src").innerHTML = "<thead><tr><th>Fonte</th><th>Esito</th><th>Date</th></tr></thead><tbody>" + rows + "</tbody>";
+  const bad = (DATA.sources || []).filter((s) => s.status === "errore" || s.status === "da_controllare");
+  $("banner").innerHTML = bad.length ? '<div class="banner">Da controllare: ' + bad.map((s) => esc(s.name)).join(", ") + ". Le date di queste fonti potrebbero non essere aggiornate.</div>" : "";
+}
+
+function render() {
+  const list = filtered();
+  renderFilters();
+  $("count").textContent = list.length + (list.length === 1 ? " data" : " date") + " mostrate su " + DATA.events.length;
+  $("vl").setAttribute("aria-pressed", String(state.view === "list"));
+  $("vm").setAttribute("aria-pressed", String(state.view === "month"));
+  if (state.view === "list") { $("out").innerHTML = renderList(list); return; }
+  if (state.ym && list.length && !list.some((e) => e.start.slice(0, 7) <= curKey() && e.end.slice(0, 7) >= curKey()) && !state.keep) state.ym = null;
+  $("out").innerHTML = renderMonth(list);
+  const p = $("pm"), n = $("nm");
+  if (p) p.addEventListener("click", () => { jump(-1, list); state.keep = true; render(); state.keep = false; });
+  if (n) n.addEventListener("click", () => { jump(1, list); state.keep = true; render(); state.keep = false; });
+}
+
+function fmtChecked(s) {
+  if (!s) return "";
+  const d = parse(s);
+  return d.getDate() + " " + MESI[d.getMonth()] + " " + d.getFullYear();
+}
+
+async function load(manual) {
+  const btn = $("refresh"), st = $("status");
+  btn.disabled = true; btn.classList.add("spin"); st.className = "status"; st.textContent = manual ? "Aggiorno…" : "";
+  try {
+    const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const before = DATA.checked, n0 = DATA.events.length;
+    DATA = await res.json();
+    $("sub").textContent = "Date di Racing Factory, Gully Racing, Promo Racing, Rosso Corsa e dei circuiti. Controllate il " + fmtChecked(DATA.checked) + ".";
+    renderSources(); render();
+    if (manual) st.textContent = before === DATA.checked && n0 === DATA.events.length ? "Già aggiornato" : "Aggiornato";
+  } catch (err) {
+    st.className = "status err";
+    st.textContent = "Impossibile aggiornare. Controlla la connessione.";
+    if (!DATA.events.length) $("sub").textContent = "Date non disponibili.";
+  } finally {
+    btn.disabled = false; btn.classList.remove("spin");
+  }
+}
+
+$("vl").addEventListener("click", () => { state.view = "list"; render(); });
+$("vm").addEventListener("click", () => { state.view = "month"; render(); });
+$("refresh").addEventListener("click", () => load(true));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(false); });
+load(false);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+
+// Suggerimento di installazione
+(function () {
+  const box = $("install");
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  if (standalone) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let deferred = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault(); deferred = e;
+    box.innerHTML = '<button type="button" id="inst">Installa l\'app</button>Si apre come un\'app, anche senza barra del browser.';
+    $("inst").addEventListener("click", async () => { deferred.prompt(); await deferred.userChoice; deferred = null; box.textContent = ""; });
+  });
+  if (ios) box.textContent = "Per installare l'app: tocca Condividi in Safari, poi «Aggiungi alla schermata Home».";
+})();
+</script>
+</body>
+</html>
