@@ -1,1 +1,33 @@
+name: Aggiorna date
 
+on:
+  schedule:
+    - cron: "0 5 * * *"   # ogni giorno alle 05:00 UTC (06:00 o 07:00 in Italia)
+  workflow_dispatch:       # avvio manuale dal pulsante "Run workflow"
+
+permissions:
+  contents: write
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Prove del programma
+        run: python3 scraper/test_scrape.py
+      - name: Leggi i siti
+        run: python3 scraper/scrape.py
+      - name: Salva le novita
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          if git diff --cached --quiet; then
+            echo "Nessuna novita"
+          else
+            git commit -m "Aggiorna date"
+            git push
+          fi
