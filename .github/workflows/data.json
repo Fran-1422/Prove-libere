@@ -1,0 +1,275 @@
+{
+ "checked": "2026-11-20",
+ "orgs": {
+  "rf": "Racing Factory",
+  "gully": "Gully Racing",
+  "promo": "Promo Racing",
+  "rosso": "Rosso Corsa",
+  "cremona": "Cremona Circuit",
+  "altro": "Altro organizzatore"
+ },
+ "circuits": [
+  {
+   "id": "mugello",
+   "name": "Mugello",
+   "country": "IT"
+  },
+  {
+   "id": "misano",
+   "name": "Misano",
+   "country": "IT"
+  },
+  {
+   "id": "cremona",
+   "name": "Cremona",
+   "country": "IT"
+  },
+  {
+   "id": "jerez",
+   "name": "Jerez",
+   "country": "ES"
+  },
+  {
+   "id": "valencia",
+   "name": "Valencia",
+   "country": "ES"
+  },
+  {
+   "id": "siviglia",
+   "name": "Siviglia",
+   "country": "ES"
+  },
+  {
+   "id": "portimao",
+   "name": "Portimão",
+   "country": "PT"
+  }
+ ],
+ "sources": [
+  {
+   "id": "rf",
+   "name": "Racing Factory",
+   "url": "https://www.racingfactory.it/",
+   "status": "ok",
+   "count": 7,
+   "message": "",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "gully",
+   "name": "Gully Racing",
+   "url": "https://www.gullyracing.it/calendario",
+   "status": "ok",
+   "count": 2,
+   "message": "",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "promo",
+   "name": "Promo Racing",
+   "url": "https://www.promoracing.it/it/calendario/moto",
+   "status": "ok",
+   "count": 2,
+   "message": "",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "rosso",
+   "name": "Rosso Corsa",
+   "url": "https://www.rossocorsaonline.com/prove",
+   "status": "ok",
+   "count": 2,
+   "message": "",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "cremona",
+   "name": "Cremona Circuit (sito ufficiale)",
+   "url": "https://cremonacircuit.it/en/booking/",
+   "status": "vuoto",
+   "count": 0,
+   "message": "Nessuna prova libera moto pubblicata.",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "mugello",
+   "name": "Mugello Circuit (sito ufficiale)",
+   "url": "https://mugellocircuit.com/en/events/bike-free-practices",
+   "status": "vuoto",
+   "count": 0,
+   "message": "Nessuna prova libera moto pubblicata.",
+   "checked": "2026-11-20"
+  }
+ ],
+ "events": [
+  {
+   "id": "rosso-valencia-2027-02-05",
+   "start": "2027-02-05",
+   "end": "2027-02-07",
+   "circuit": "valencia",
+   "circuit_name": "Valencia",
+   "country": "ES",
+   "org": "rosso",
+   "price": "da 759 €",
+   "note": "",
+   "url": "https://www.rossocorsaonline.com/prove/detail/391",
+   "src": "rosso"
+  },
+  {
+   "id": "promo-portimao-2027-02-08",
+   "start": "2027-02-08",
+   "end": "2027-02-10",
+   "circuit": "portimao",
+   "circuit_name": "Portimão",
+   "country": "PT",
+   "org": "promo",
+   "price": "",
+   "note": "",
+   "url": "https://www.promoracing.it/it/calendario/moto.690/prove-moto",
+   "src": "promo"
+  },
+  {
+   "id": "rf-siviglia-2027-02-18",
+   "start": "2027-02-18",
+   "end": "2027-02-20",
+   "circuit": "siviglia",
+   "circuit_name": "Siviglia",
+   "country": "ES",
+   "org": "rf",
+   "price": "1.100 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-siviglia-18-20-febbraio-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "gully-valencia-2027-02-26",
+   "start": "2027-02-26",
+   "end": "2027-02-28",
+   "circuit": "valencia",
+   "circuit_name": "Valencia",
+   "country": "ES",
+   "org": "gully",
+   "price": "759 € promo, 779 € intero",
+   "note": "",
+   "url": "https://www.gullyracing.it/prodotto?id=219",
+   "src": "gully"
+  },
+  {
+   "id": "rosso-jerez-2027-03-05",
+   "start": "2027-03-05",
+   "end": "2027-03-07",
+   "circuit": "jerez",
+   "circuit_name": "Jerez",
+   "country": "ES",
+   "org": "rosso",
+   "price": "da 759 €",
+   "note": "",
+   "url": "https://www.rossocorsaonline.com/prove/detail/393",
+   "src": "rosso"
+  },
+  {
+   "id": "promo-jerez-2027-03-19",
+   "start": "2027-03-19",
+   "end": "2027-03-21",
+   "circuit": "jerez",
+   "circuit_name": "Jerez",
+   "country": "ES",
+   "org": "promo",
+   "price": "",
+   "note": "",
+   "url": "https://www.promoracing.it/it/calendario/moto.691/prove-moto-",
+   "src": "promo"
+  },
+  {
+   "id": "rf-cremona-2027-03-22",
+   "start": "2027-03-22",
+   "end": "2027-03-22",
+   "circuit": "cremona",
+   "circuit_name": "Cremona",
+   "country": "IT",
+   "org": "rf",
+   "price": "189 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-cremona-22-marzo-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "rf-cremona-2027-03-29",
+   "start": "2027-03-29",
+   "end": "2027-03-29",
+   "circuit": "cremona",
+   "circuit_name": "Cremona",
+   "country": "IT",
+   "org": "rf",
+   "price": "219 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-cremona-29-marzo-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "rf-cremona-2027-04-25",
+   "start": "2027-04-25",
+   "end": "2027-04-25",
+   "circuit": "cremona",
+   "circuit_name": "Cremona",
+   "country": "IT",
+   "org": "rf",
+   "price": "219 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-cremona-circuit-25-aprile-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "rf-misano-2027-06-01",
+   "start": "2027-06-01",
+   "end": "2027-06-01",
+   "circuit": "misano",
+   "circuit_name": "Misano",
+   "country": "IT",
+   "org": "rf",
+   "price": "249 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-1-giugno-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "rf-misano-2027-08-29",
+   "start": "2027-08-29",
+   "end": "2027-08-29",
+   "circuit": "misano",
+   "circuit_name": "Misano",
+   "country": "IT",
+   "org": "rf",
+   "price": "249 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-29-agosto-2027-domencia/",
+   "src": "rf"
+  },
+  {
+   "id": "rf-misano-2027-09-20",
+   "start": "2027-09-20",
+   "end": "2027-09-20",
+   "circuit": "misano",
+   "circuit_name": "Misano",
+   "country": "IT",
+   "org": "rf",
+   "price": "249 € IVA incl.",
+   "note": "",
+   "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-20-settembre-2027/",
+   "src": "rf"
+  },
+  {
+   "id": "gully-jerez-2027-11-05",
+   "start": "2027-11-05",
+   "end": "2027-11-07",
+   "circuit": "jerez",
+   "circuit_name": "Jerez",
+   "country": "ES",
+   "org": "gully",
+   "price": "719 € promo, 759 € intero",
+   "note": "",
+   "url": "https://www.gullyracing.it/prodotto?id=221",
+   "src": "gully"
+  }
+ ]
+}
