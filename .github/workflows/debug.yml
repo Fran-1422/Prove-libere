@@ -1,0 +1,22 @@
+name: Debug pagine
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scarica pagine
+        run: |
+          mkdir -p debug
+          curl -sL -m 60 -A "Mozilla/5.0 (compatible; CalendarioProveLibere/1.0)" -H "Accept-Language: it,en;q=0.8" -w "%{http_code} %{size_download}\n" -o debug/speer.html https://www.speer-racing.de/en/ > debug/speer.txt || true
+          curl -sL -m 60 -A "Mozilla/5.0 (compatible; CalendarioProveLibere/1.0)" -H "Accept-Language: it,en;q=0.8" -w "%{http_code} %{size_download}\n" -o debug/rehm.html https://www.rehmracedays.com/it/rehm-race-calendario/ > debug/rehm.txt || true
+      - name: Salva
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add debug
+          git commit -m "debug pagine" || true
+          git push
