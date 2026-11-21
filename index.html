@@ -316,6 +316,8 @@ async function load(manual) {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const before = DATA.checked, n0 = DATA.events.length;
     DATA = await res.json();
+    const oggi = iso(new Date());
+    DATA.events = DATA.events.filter((e) => e.end >= oggi); // le date passate spariscono subito, anche tra un aggiornamento e l'altro
     $("sub").textContent = "Date di Racing Factory, Gully Racing, Promo Racing, Rosso Corsa, Rehm, Speer Racing e dei circuiti. Controllate il " + fmtChecked(DATA.checked) + ".";
     renderSources(); render();
     if (manual) st.textContent = before === DATA.checked && n0 === DATA.events.length ? "Già aggiornato" : "Aggiornato";
