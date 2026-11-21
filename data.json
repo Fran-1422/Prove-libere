@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-20",
+ "checked": "2026-11-21",
  "orgs": {
   "rf": "Racing Factory",
   "gully": "Gully Racing",
@@ -95,6 +95,11 @@
    "id": "calafat",
    "name": "Calafat",
    "country": "ES"
+  },
+  {
+   "id": "most",
+   "name": "Most",
+   "country": "CZ"
   }
  ],
  "sources": [
@@ -105,7 +110,7 @@
    "status": "ok",
    "count": 7,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "gully",
@@ -114,7 +119,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "promo",
@@ -123,7 +128,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "rosso",
@@ -132,14 +137,14 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "rehm",
    "name": "Rehm Race Days (sito ufficiale)",
    "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
    "status": "ok",
-   "count": 12,
+   "count": 27,
    "message": "",
    "checked": "2026-11-21"
   },
@@ -147,9 +152,9 @@
    "id": "speer",
    "name": "Speer Racing (sito ufficiale)",
    "url": "https://www.speer-racing.de/en/",
-   "status": "ok",
-   "count": 11,
-   "message": "",
+   "status": "da_controllare",
+   "count": 7,
+   "message": "Nessuna data letta, forse il sito e' cambiato. Tengo le date precedenti.",
    "checked": "2026-11-21"
   },
   {
@@ -166,7 +171,7 @@
    "name": "Speer Racing (via Racing4Fun)",
    "url": "https://www.racing4fun.de/veranstalter/speer-racing-gmbh/",
    "status": "ok",
-   "count": 11,
+   "count": 34,
    "message": "",
    "checked": "2026-11-21"
   },
@@ -177,7 +182,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "mugello",
@@ -186,7 +191,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   }
  ],
  "events": [
@@ -425,6 +430,20 @@
    "src": "speer"
   },
   {
+   "id": "speer-barcellona-2027-03-26-95891",
+   "start": "2027-03-26",
+   "end": "2027-03-28",
+   "circuit": "barcellona",
+   "circuit_name": "Barcellona",
+   "country": "ES",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95891/",
+   "uid": "95891",
+   "src": "speer4f"
+  },
+  {
    "id": "rehm-rijeka-2027-03-26",
    "start": "2027-03-26",
    "end": "2027-03-28",
@@ -451,7 +470,7 @@
    "src": "rf"
   },
   {
-   "id": "speer-hockenheim-2027-03-29-94531",
+   "id": "speer-hockenheim-2027-03-29",
    "start": "2027-03-29",
    "end": "2027-03-29",
    "circuit": "hockenheim",
@@ -459,9 +478,22 @@
    "country": "DE",
    "org": "speer",
    "price": "",
-   "note": "",
+   "note": "1 Tag Instruktorenrtraining - Hockenheimring GP",
    "url": "https://www.racing4fun.de/event/94531/",
-   "uid": "94531",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-aragon-2027-03-30-95892",
+   "start": "2027-03-30",
+   "end": "2027-04-01",
+   "circuit": "aragon",
+   "circuit_name": "Aragon",
+   "country": "ES",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95892/",
+   "uid": "95892",
    "src": "speer4f"
   },
   {
@@ -476,6 +508,20 @@
    "note": "",
    "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
    "src": "rehm"
+  },
+  {
+   "id": "speer-hockenheim-2027-04-17-95898",
+   "start": "2027-04-17",
+   "end": "2027-04-18",
+   "circuit": "hockenheim",
+   "circuit_name": "Hockenheim",
+   "country": "DE",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95898/",
+   "uid": "95898",
+   "src": "speer4f"
   },
   {
    "id": "rehm-aragon-2027-04-22",
@@ -531,9 +577,50 @@
    "src": "speer4f"
   },
   {
+   "id": "speer-most-2027-05-07-95909",
+   "start": "2027-05-07",
+   "end": "2027-05-09",
+   "circuit": "most",
+   "circuit_name": "Most",
+   "country": "CZ",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95909/",
+   "uid": "95909",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-mugello-2027-05-07-95910",
+   "start": "2027-05-07",
+   "end": "2027-05-09",
+   "circuit": "mugello",
+   "circuit_name": "Mugello",
+   "country": "IT",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95910/",
+   "uid": "95910",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-rijeka-2027-05-17",
+   "start": "2027-05-17",
+   "end": "2027-05-20",
+   "circuit": "rijeka",
+   "circuit_name": "Rijeka",
+   "country": "HR",
+   "org": "speer",
+   "price": "",
+   "note": "4 Tage Freies Fahren",
+   "url": "https://www.racing4fun.de/event/95912/",
+   "src": "speer4f"
+  },
+  {
    "id": "speer-hockenheim-2027-05-22",
    "start": "2027-05-22",
-   "end": "2027-05-22",
+   "end": "2027-05-23",
    "circuit": "hockenheim",
    "circuit_name": "Hockenheim",
    "country": "DE",
@@ -555,6 +642,19 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-1-giugno-2027/",
    "src": "rf"
+  },
+  {
+   "id": "speer-hockenheim-2027-06-13",
+   "start": "2027-06-13",
+   "end": "2027-06-14",
+   "circuit": "hockenheim",
+   "circuit_name": "Hockenheim",
+   "country": "DE",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95904/",
+   "src": "speer4f"
   },
   {
    "id": "speer-mugello-2027-07-02",
@@ -622,6 +722,20 @@
    "src": "rf"
   },
   {
+   "id": "speer-mugello-2027-09-10-95911",
+   "start": "2027-09-10",
+   "end": "2027-09-12",
+   "circuit": "mugello",
+   "circuit_name": "Mugello",
+   "country": "IT",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95911/",
+   "uid": "95911",
+   "src": "speer4f"
+  },
+  {
    "id": "rf-misano-2027-09-20",
    "start": "2027-09-20",
    "end": "2027-09-20",
@@ -633,6 +747,47 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-20-settembre-2027/",
    "src": "rf"
+  },
+  {
+   "id": "speer-hockenheim-2027-09-27",
+   "start": "2027-09-27",
+   "end": "2027-09-27",
+   "circuit": "hockenheim",
+   "circuit_name": "Hockenheim",
+   "country": "DE",
+   "org": "speer",
+   "price": "",
+   "note": "1 Tag Instruktorenrtraining - Hockenheimring GP",
+   "url": "https://www.racing4fun.de/event/95907/",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-barcellona-2027-10-01-95894",
+   "start": "2027-10-01",
+   "end": "2027-10-03",
+   "circuit": "barcellona",
+   "circuit_name": "Barcellona",
+   "country": "ES",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95894/",
+   "uid": "95894",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-anneau-du-rhin-2027-10-03-95893",
+   "start": "2027-10-03",
+   "end": "2027-10-03",
+   "circuit": "anneau-du-rhin",
+   "circuit_name": "Anneau du Rhin",
+   "country": "FR",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/95893/",
+   "uid": "95893",
+   "src": "speer4f"
   },
   {
    "id": "gully-jerez-2027-11-05",
