@@ -152,9 +152,9 @@
    "id": "speer",
    "name": "Speer Racing (sito ufficiale)",
    "url": "https://www.speer-racing.de/en/",
-   "status": "da_controllare",
-   "count": 7,
-   "message": "Nessuna data letta, forse il sito e' cambiato. Tengo le date precedenti.",
+   "status": "ok",
+   "count": 51,
+   "message": "",
    "checked": "2026-11-21"
   },
   {
@@ -424,24 +424,23 @@
    "circuit_name": "Anneau du Rhin",
    "country": "FR",
    "org": "speer",
-   "price": "da 264 €",
+   "price": "da 226 €",
    "note": "",
    "url": "https://www.speer-racing.de/en/",
    "src": "speer"
   },
   {
-   "id": "speer-barcellona-2027-03-26-95891",
+   "id": "speer-barcellona-2027-03-26",
    "start": "2027-03-26",
    "end": "2027-03-28",
    "circuit": "barcellona",
    "circuit_name": "Barcellona",
    "country": "ES",
    "org": "speer",
-   "price": "",
+   "price": "da 658 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95891/",
-   "uid": "95891",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "rehm-rijeka-2027-03-26",
@@ -477,24 +476,23 @@
    "circuit_name": "Hockenheim",
    "country": "DE",
    "org": "speer",
-   "price": "",
-   "note": "1 Tag Instruktorenrtraining - Hockenheimring GP",
-   "url": "https://www.racing4fun.de/event/94531/",
-   "src": "speer4f"
+   "price": "da 223 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
-   "id": "speer-aragon-2027-03-30-95892",
+   "id": "speer-aragon-2027-03-30",
    "start": "2027-03-30",
    "end": "2027-04-01",
    "circuit": "aragon",
    "circuit_name": "Aragon",
    "country": "ES",
    "org": "speer",
-   "price": "",
+   "price": "da 512 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95892/",
-   "uid": "95892",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "rehm-portimao-2027-04-03",
@@ -510,18 +508,17 @@
    "src": "rehm"
   },
   {
-   "id": "speer-hockenheim-2027-04-17-95898",
+   "id": "speer-hockenheim-2027-04-17",
    "start": "2027-04-17",
    "end": "2027-04-18",
    "circuit": "hockenheim",
    "circuit_name": "Hockenheim",
    "country": "DE",
    "org": "speer",
-   "price": "",
+   "price": "da 271 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95898/",
-   "uid": "95898",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "rehm-aragon-2027-04-22",
@@ -563,46 +560,30 @@
    "src": "rehm"
   },
   {
-   "id": "speer-anneau-du-rhin-2027-04-30-92347",
+   "id": "speer-anneau-du-rhin-2027-04-30",
    "start": "2027-04-30",
    "end": "2027-05-01",
    "circuit": "anneau-du-rhin",
    "circuit_name": "Anneau du Rhin",
    "country": "FR",
    "org": "speer",
-   "price": "",
+   "price": "da 243 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/92347/",
-   "uid": "92347",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
-   "id": "speer-most-2027-05-07-95909",
+   "id": "speer-most-2027-05-07",
    "start": "2027-05-07",
    "end": "2027-05-09",
    "circuit": "most",
    "circuit_name": "Most",
    "country": "CZ",
    "org": "speer",
-   "price": "",
+   "price": "da 533 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95909/",
-   "uid": "95909",
-   "src": "speer4f"
-  },
-  {
-   "id": "speer-mugello-2027-05-07-95910",
-   "start": "2027-05-07",
-   "end": "2027-05-09",
-   "circuit": "mugello",
-   "circuit_name": "Mugello",
-   "country": "IT",
-   "org": "speer",
-   "price": "",
-   "note": "",
-   "url": "https://www.racing4fun.de/event/95910/",
-   "uid": "95910",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "speer-rijeka-2027-05-17",
@@ -612,10 +593,10 @@
    "circuit_name": "Rijeka",
    "country": "HR",
    "org": "speer",
-   "price": "",
-   "note": "4 Tage Freies Fahren",
-   "url": "https://www.racing4fun.de/event/95912/",
-   "src": "speer4f"
+   "price": "da 349 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "speer-hockenheim-2027-05-22",
@@ -651,10 +632,10 @@
    "circuit_name": "Hockenheim",
    "country": "DE",
    "org": "speer",
-   "price": "",
+   "price": "da 271 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95904/",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "speer-mugello-2027-07-02",
@@ -664,7 +645,7 @@
    "circuit_name": "Mugello",
    "country": "IT",
    "org": "speer",
-   "price": "da 999 €",
+   "price": "da 679 €",
    "note": "",
    "url": "https://www.speer-racing.de/en/",
    "src": "speer"
@@ -677,7 +658,7 @@
    "circuit_name": "Assen",
    "country": "NL",
    "org": "speer",
-   "price": "da 599 €",
+   "price": "da 305 €",
    "note": "",
    "url": "https://www.speer-racing.de/en/",
    "src": "speer"
@@ -690,10 +671,10 @@
    "circuit_name": "Anneau du Rhin",
    "country": "FR",
    "org": "speer",
-   "price": "",
+   "price": "da 228 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/92355/",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "speer-brno-2027-07-30",
@@ -703,7 +684,7 @@
    "circuit_name": "Brno",
    "country": "CZ",
    "org": "speer",
-   "price": "da 799 €",
+   "price": "da 562 €",
    "note": "",
    "url": "https://www.speer-racing.de/en/",
    "src": "speer"
@@ -722,18 +703,17 @@
    "src": "rf"
   },
   {
-   "id": "speer-mugello-2027-09-10-95911",
+   "id": "speer-mugello-2027-09-10",
    "start": "2027-09-10",
    "end": "2027-09-12",
    "circuit": "mugello",
    "circuit_name": "Mugello",
    "country": "IT",
    "org": "speer",
-   "price": "",
+   "price": "da 679 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95911/",
-   "uid": "95911",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "rf-misano-2027-09-20",
@@ -756,38 +736,36 @@
    "circuit_name": "Hockenheim",
    "country": "DE",
    "org": "speer",
-   "price": "",
-   "note": "1 Tag Instruktorenrtraining - Hockenheimring GP",
-   "url": "https://www.racing4fun.de/event/95907/",
-   "src": "speer4f"
+   "price": "da 271 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
-   "id": "speer-barcellona-2027-10-01-95894",
+   "id": "speer-barcellona-2027-10-01",
    "start": "2027-10-01",
    "end": "2027-10-03",
    "circuit": "barcellona",
    "circuit_name": "Barcellona",
    "country": "ES",
    "org": "speer",
-   "price": "",
+   "price": "da 658 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95894/",
-   "uid": "95894",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
-   "id": "speer-anneau-du-rhin-2027-10-03-95893",
+   "id": "speer-anneau-du-rhin-2027-10-03",
    "start": "2027-10-03",
    "end": "2027-10-03",
    "circuit": "anneau-du-rhin",
    "circuit_name": "Anneau du Rhin",
    "country": "FR",
    "org": "speer",
-   "price": "",
+   "price": "da 264 €",
    "note": "",
-   "url": "https://www.racing4fun.de/event/95893/",
-   "uid": "95893",
-   "src": "speer4f"
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "gully-jerez-2027-11-05",
