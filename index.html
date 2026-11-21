@@ -49,6 +49,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .chip[aria-pressed="true"] .n { color: inherit; opacity: 0.85; }
 .chip.zero { border-style: dashed; color: var(--muted); }
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.dd { position: relative; }
+.dd-btn { width: 100%; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); border-radius: 8px; padding: 9px 12px; min-height: 42px; font-size: 0.92rem; text-align: left; cursor: pointer; }
+.dd-btn[aria-expanded="true"] { border-color: var(--accent); }
+.dd-btn.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.dd-v { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-btn svg { width: 16px; height: 16px; flex: none; color: var(--muted); transition: transform 0.15s; }
+.dd-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.dd-list { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; right: 0; min-width: 220px; max-height: min(60vh, 360px); overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 4px; }
+.dd-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; cursor: pointer; font-size: 0.92rem; }
+.dd-opt:hover { background: var(--surface-2); }
+.dd-opt input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); flex: none; }
+.dd-opt .t { flex: 1; min-width: 0; }
+.dd-opt .n, .dd-btn .n { font-family: var(--f-mono); font-size: 0.78rem; color: var(--muted); }
+.dd-opt.zero .t { color: var(--muted); }
+.dd-opt.all { border-bottom: 1px solid var(--line); border-radius: 6px 6px 0 0; margin-bottom: 2px; font-weight: 600; }
+.dd-btn:focus-visible, .dd-opt input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chip:focus-visible, .seg button:focus-visible, .nav button:focus-visible, .refresh:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c, var(--muted)); flex: none; }
 .chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px var(--accent-fg); }
@@ -137,10 +154,10 @@ a { color: var(--accent); }
 
   <div id="banner"></div>
 
-  <section class="panel" aria-label="Filtri">
-    <div><div class="label">Nazione</div><div class="chips" id="fn"></div></div>
-    <div><div class="label">Circuito</div><div class="chips" id="fc"></div></div>
-    <div><div class="label">Organizzatore</div><div class="chips" id="fo"></div></div>
+  <section class="panel filters" aria-label="Filtri">
+    <div><div class="label" id="fn-l">Nazione</div><div class="dd" id="fn" data-key="countries"></div></div>
+    <div><div class="label" id="fc-l">Circuito</div><div class="dd" id="fc" data-key="circuits"></div></div>
+    <div><div class="label" id="fo-l">Organizzatore</div><div class="dd" id="fo" data-key="orgs"></div></div>
   </section>
 
   <div class="bar">
@@ -169,7 +186,7 @@ const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "rehm", "speer",
 const STATO = { ok: "ok", vuoto: "nessuna data", da_controllare: "da controllare", errore: "errore" };
 
 let DATA = { events: [], circuits: [], orgs: {}, sources: [] };
-const state = { countries: new Set(), circuits: new Set(), orgs: new Set(), view: "list", ym: null };
+const state = { countries: new Set(), circuits: new Set(), orgs: new Set(), view: "list", ym: null, open: null };
 const NAZIONI = { IT: "Italia", ES: "Spagna", FR: "Francia", DE: "Germania", PT: "Portogallo", HR: "Croazia", CZ: "Rep. Ceca", NL: "Paesi Bassi", AT: "Austria", SI: "Slovenia", HU: "Ungheria", BE: "Belgio", GB: "Regno Unito", CH: "Svizzera", PL: "Polonia", SK: "Slovacchia" };
 const flag = (cc) => /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint(...[...cc].map((ch) => 0x1F1A5 + ch.charCodeAt(0))) : "";
 const nationName = (cc) => NAZIONI[cc] || cc;
@@ -188,50 +205,70 @@ function filtered() {
     .sort((a, b) => a.start.localeCompare(b.start));
 }
 
-function chip(label, pressed, n, onClick, color) {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "chip" + (n === 0 ? " zero" : "");
-  b.setAttribute("aria-pressed", pressed ? "true" : "false");
-  b.innerHTML = (color ? '<span class="dot" style="--c:' + color + '"></span>' : "") + esc(label) + ' <span class="n">' + n + "</span>";
-  if (n === 0) b.title = "Nessuna data pubblicata";
-  b.addEventListener("click", onClick);
-  return b;
+const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+
+// Elenco a discesa con selezione multipla. items: { value, label, n, color }
+function dropdown(el, key, allLabel, pluralLabel, items, totalN) {
+  const sel = state[key], open = state.open === key, id = el.id;
+  const chosen = items.filter((it) => sel.has(it.value));
+  const summary = !sel.size ? allLabel : chosen.length <= 2 ? chosen.map((it) => it.label).join(", ") : chosen.length + " " + pluralLabel;
+  const opt = (it) => '<label class="dd-opt' + (it.n === 0 ? " zero" : "") + '"' + (it.n === 0 ? ' title="Nessuna data pubblicata"' : "") + '><input type="checkbox" value="' + esc(it.value) + '"' + (sel.has(it.value) ? " checked" : "") + ">" +
+    (it.color ? '<span class="dot" style="--c:' + it.color + '"></span>' : "") + '<span class="t">' + esc(it.label) + '</span><span class="n">' + it.n + "</span></label>";
+  el.innerHTML = '<button type="button" class="dd-btn' + (sel.size ? " on" : "") + '" aria-haspopup="true" aria-expanded="' + open + '" aria-controls="' + id + '-list" aria-labelledby="' + id + "-l " + id + '-v">' +
+    '<span class="dd-v" id="' + id + '-v">' + esc(summary) + "</span>" + CHEV + "</button>" +
+    '<div class="dd-list" id="' + id + '-list" role="group" aria-labelledby="' + id + '-l"' + (open ? "" : " hidden") + ">" +
+    '<label class="dd-opt all"><input type="checkbox" data-all' + (sel.size ? "" : " checked") + '><span class="t">' + esc(allLabel) + '</span><span class="n">' + totalN + "</span></label>" +
+    items.map(opt).join("") + "</div>";
 }
 
 function renderFilters() {
-  const fn = $("fn"); fn.replaceChildren();
   const ccs = [...new Set([...DATA.circuits.map((c) => c.country), ...DATA.events.map(evCountry)])].filter(Boolean)
     .sort((a, b) => nationName(a).localeCompare(nationName(b), "it"));
-  fn.append(chip("Tutte", state.countries.size === 0, DATA.events.length, () => { state.countries.clear(); render(); }));
-  ccs.forEach((cc) => {
-    const n = DATA.events.filter((e) => evCountry(e) === cc).length;
-    fn.append(chip((flag(cc) ? flag(cc) + " " : "") + nationName(cc), state.countries.has(cc), n, () => {
-      state.countries.has(cc) ? state.countries.delete(cc) : state.countries.add(cc);
-      // Tieni scelti solo i circuiti delle nazioni ancora selezionate
-      if (state.countries.size) [...state.circuits].forEach((id) => { if (!state.countries.has(circ(id).country)) state.circuits.delete(id); });
-      render();
-    }));
-  });
-  const fc = $("fc"); fc.replaceChildren();
+  dropdown($("fn"), "countries", "Tutte", "nazioni", ccs.map((cc) => ({
+    value: cc, label: (flag(cc) ? flag(cc) + " " : "") + nationName(cc), n: DATA.events.filter((e) => evCountry(e) === cc).length,
+  })), DATA.events.length);
   const shown = DATA.circuits.filter((c) => !state.countries.size || state.countries.has(c.country));
-  fc.append(chip("Tutti", state.circuits.size === 0, DATA.events.filter((e) => !state.countries.size || state.countries.has(evCountry(e))).length, () => { state.circuits.clear(); render(); }));
-  shown.forEach((c) => {
-    const n = DATA.events.filter((e) => e.circuit === c.id).length;
-    fc.append(chip(c.name + (c.country ? " · " + c.country : ""), state.circuits.has(c.id), n, () => {
-      state.circuits.has(c.id) ? state.circuits.delete(c.id) : state.circuits.add(c.id); render();
-    }));
-  });
-  const fo = $("fo"); fo.replaceChildren();
+  dropdown($("fc"), "circuits", "Tutti", "circuiti", shown.map((c) => ({
+    value: c.id, label: c.name + (c.country ? " · " + c.country : ""), n: DATA.events.filter((e) => e.circuit === c.id).length,
+  })), DATA.events.filter((e) => !state.countries.size || state.countries.has(evCountry(e))).length);
   const orgs = [...new Set([...Object.keys(DATA.orgs), ...DATA.events.map((e) => e.org)])].filter((o) => o !== "altro" || DATA.events.some((e) => e.org === "altro"));
-  fo.append(chip("Tutti", state.orgs.size === 0, DATA.events.length, () => { state.orgs.clear(); render(); }));
-  orgs.forEach((o) => {
-    const n = DATA.events.filter((e) => e.org === o).length;
-    fo.append(chip(orgName(o), state.orgs.has(o), n, () => {
-      state.orgs.has(o) ? state.orgs.delete(o) : state.orgs.add(o); render();
-    }, orgColor(o)));
-  });
+  dropdown($("fo"), "orgs", "Tutti", "organizzatori", orgs.map((o) => ({
+    value: o, label: orgName(o), n: DATA.events.filter((e) => e.org === o).length, color: orgColor(o),
+  })), DATA.events.length);
 }
+
+document.querySelector(".filters").addEventListener("click", (ev) => {
+  const btn = ev.target.closest(".dd-btn");
+  if (!btn) return;
+  const key = btn.closest(".dd").dataset.key;
+  state.open = state.open === key ? null : key;
+  renderFilters();
+  document.querySelector('.dd[data-key="' + key + '"] .dd-btn').focus();
+});
+document.querySelector(".filters").addEventListener("change", (ev) => {
+  const input = ev.target, dd = input.closest(".dd");
+  if (!dd) return;
+  const key = dd.dataset.key, sel = state[key];
+  if (input.hasAttribute("data-all")) sel.clear();
+  else input.checked ? sel.add(input.value) : sel.delete(input.value);
+  // Tieni scelti solo i circuiti delle nazioni ancora selezionate
+  if (key === "countries" && state.countries.size) [...state.circuits].forEach((id) => { if (!state.countries.has(circ(id).country)) state.circuits.delete(id); });
+  const scroll = dd.querySelector(".dd-list").scrollTop;
+  render();
+  const list = document.querySelector('.dd[data-key="' + key + '"] .dd-list');
+  list.scrollTop = scroll;
+  const again = input.hasAttribute("data-all") ? list.querySelector("[data-all]") : list.querySelector('input[value="' + CSS.escape(input.value) + '"]');
+  if (again) again.focus({ preventScroll: true });
+});
+document.addEventListener("click", (ev) => {
+  // Un elemento staccato dal documento viene da un elenco appena ridisegnato: non è un clic fuori
+  if (state.open && ev.target.isConnected && !ev.target.closest(".dd")) { state.open = null; renderFilters(); }
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Escape" || !state.open) return;
+  const key = state.open; state.open = null; renderFilters();
+  document.querySelector('.dd[data-key="' + key + '"] .dd-btn').focus();
+});
 
 function dateBlock(e) {
   const a = parse(e.start), b = parse(e.end), same = e.start === e.end;
