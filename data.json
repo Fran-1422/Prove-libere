@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-20",
+ "checked": "2026-11-21",
  "orgs": {
   "rf": "Racing Factory",
   "gully": "Gully Racing",
@@ -53,7 +53,7 @@
    "status": "ok",
    "count": 7,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "gully",
@@ -62,7 +62,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "promo",
@@ -71,7 +71,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "rosso",
@@ -80,7 +80,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "cremona",
@@ -89,7 +89,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   },
   {
    "id": "mugello",
@@ -98,7 +98,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-20"
+   "checked": "2026-11-21"
   }
  ],
  "events": [
