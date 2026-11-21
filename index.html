@@ -138,6 +138,7 @@ a { color: var(--accent); }
   <div id="banner"></div>
 
   <section class="panel" aria-label="Filtri">
+    <div><div class="label">Nazione</div><div class="chips" id="fn"></div></div>
     <div><div class="label">Circuito</div><div class="chips" id="fc"></div></div>
     <div><div class="label">Organizzatore</div><div class="chips" id="fo"></div></div>
   </section>
@@ -168,7 +169,10 @@ const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "rehm", "speer",
 const STATO = { ok: "ok", vuoto: "nessuna data", da_controllare: "da controllare", errore: "errore" };
 
 let DATA = { events: [], circuits: [], orgs: {}, sources: [] };
-const state = { circuits: new Set(), orgs: new Set(), view: "list", ym: null };
+const state = { countries: new Set(), circuits: new Set(), orgs: new Set(), view: "list", ym: null };
+const NAZIONI = { IT: "Italia", ES: "Spagna", FR: "Francia", DE: "Germania", PT: "Portogallo", HR: "Croazia", CZ: "Rep. Ceca", NL: "Paesi Bassi", AT: "Austria", SI: "Slovenia", HU: "Ungheria", BE: "Belgio", GB: "Regno Unito", CH: "Svizzera", PL: "Polonia", SK: "Slovacchia" };
+const flag = (cc) => /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint(...[...cc].map((ch) => 0x1F1A5 + ch.charCodeAt(0))) : "";
+const nationName = (cc) => NAZIONI[cc] || cc;
 const $ = (id) => document.getElementById(id);
 const parse = (s) => new Date(s + "T00:00:00");
 const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
@@ -177,9 +181,10 @@ const safeUrl = (u) => /^https?:\/\//i.test(u) ? u : "#";
 const orgColor = (o) => "var(--o-" + (KNOWN_ORGS.includes(o) ? o : "altro") + ")";
 const orgName = (o) => DATA.orgs[o] || o;
 const circ = (id) => DATA.circuits.find((c) => c.id === id) || { id, name: id, country: "" };
+const evCountry = (e) => e.country || circ(e.circuit).country || "";
 
 function filtered() {
-  return DATA.events.filter((e) => (!state.circuits.size || state.circuits.has(e.circuit)) && (!state.orgs.size || state.orgs.has(e.org)))
+  return DATA.events.filter((e) => (!state.countries.size || state.countries.has(evCountry(e))) && (!state.circuits.size || state.circuits.has(e.circuit)) && (!state.orgs.size || state.orgs.has(e.org)))
     .sort((a, b) => a.start.localeCompare(b.start));
 }
 
@@ -195,9 +200,23 @@ function chip(label, pressed, n, onClick, color) {
 }
 
 function renderFilters() {
+  const fn = $("fn"); fn.replaceChildren();
+  const ccs = [...new Set([...DATA.circuits.map((c) => c.country), ...DATA.events.map(evCountry)])].filter(Boolean)
+    .sort((a, b) => nationName(a).localeCompare(nationName(b), "it"));
+  fn.append(chip("Tutte", state.countries.size === 0, DATA.events.length, () => { state.countries.clear(); render(); }));
+  ccs.forEach((cc) => {
+    const n = DATA.events.filter((e) => evCountry(e) === cc).length;
+    fn.append(chip((flag(cc) ? flag(cc) + " " : "") + nationName(cc), state.countries.has(cc), n, () => {
+      state.countries.has(cc) ? state.countries.delete(cc) : state.countries.add(cc);
+      // Tieni scelti solo i circuiti delle nazioni ancora selezionate
+      if (state.countries.size) [...state.circuits].forEach((id) => { if (!state.countries.has(circ(id).country)) state.circuits.delete(id); });
+      render();
+    }));
+  });
   const fc = $("fc"); fc.replaceChildren();
-  fc.append(chip("Tutti", state.circuits.size === 0, DATA.events.length, () => { state.circuits.clear(); render(); }));
-  DATA.circuits.forEach((c) => {
+  const shown = DATA.circuits.filter((c) => !state.countries.size || state.countries.has(c.country));
+  fc.append(chip("Tutti", state.circuits.size === 0, DATA.events.filter((e) => !state.countries.size || state.countries.has(evCountry(e))).length, () => { state.circuits.clear(); render(); }));
+  shown.forEach((c) => {
     const n = DATA.events.filter((e) => e.circuit === c.id).length;
     fc.append(chip(c.name + (c.country ? " · " + c.country : ""), state.circuits.has(c.id), n, () => {
       state.circuits.has(c.id) ? state.circuits.delete(c.id) : state.circuits.add(c.id); render();
@@ -224,6 +243,7 @@ function dateBlock(e) {
 function emptyMsg() {
   const names = [...state.circuits].map((id) => circ(id).name);
   let m = "Nessuna data con questi filtri.";
+  if (!names.length && state.countries.size) names.push(...[...state.countries].map(nationName));
   if (names.length) m = "Nessuna data pubblicata per " + names.join(", ") + (state.orgs.size ? " con gli organizzatori scelti" : "") + ". Gli organizzatori non ne hanno ancora caricate.";
   return '<div class="empty">' + esc(m) + "</div>";
 }
