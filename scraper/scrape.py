@@ -465,6 +465,46 @@ def parse_official(org, base, skip_words=(), need_circuit=True):
     return parse
 
 
+SPEER_DATE = re.compile(
+    r"(\d{1,2})\.(?: ([A-Z][a-z]{2,4}))?(?: - (\d{1,2})\.(?: ([A-Z][a-z]{2,4}))?)? (20\d\d)")
+SPEER_SKIP = ("instruktor", "instructor", "coaching", "schraglagen", "slt ")
+
+
+def parse_speer(html, today):
+    """speer-racing.de: ogni scheda inizia con la data ("03. - 05. Jan 2027"), poi titolo,
+    categoria, "speerkompass", circuito, prezzo ("€ 741.60"). Ogni scheda compare due volte
+    (la seconda con "On-site services", senza prezzo): si scarta."""
+    base = "https://www.speer-racing.de/en/"
+    text = clean(re.sub(r"⟦[^⟧]*⟧", " ", page(html, base).text()))
+    hits = list(SPEER_DATE.finditer(text))
+    out = []
+    for i, m in enumerate(hits):
+        seg = text[m.end(): hits[i + 1].start() if i + 1 < len(hits) else len(text)][:400]
+        if re.match(r".{0,120}?speerkompass On-site", seg):
+            continue
+        d1, mon1, d2, mon2, y = int(m.group(1)), m.group(2), m.group(3), m.group(4), int(m.group(5))
+        m2 = month_num(mon2 or mon1 or "")
+        m1 = month_num(mon1) if mon1 else m2
+        if not m1 or not m2:
+            continue
+        a = safe_date(y, m1, d1)
+        b = safe_date(y, m2, int(d2)) if d2 else a
+        if not a or not b or b < a or (b - a).days > 10:
+            continue
+        head = fold(seg[:140])
+        if any(w in head for w in SPEER_SKIP):
+            continue
+        circ = find_circuit(seg[:140])
+        if not circ:
+            continue
+        pr = re.search(r"€\s*(\d[\d\.]*)", seg)
+        price = ""
+        if pr and re.fullmatch(r"\d+(?:\.\d{3})*\.\d{2}", pr.group(1)):
+            price = "da %d €" % int(pr.group(1).rsplit(".", 1)[0].replace(".", ""))
+        out.append(event("speer", a, b, circ, price, "", base))
+    return out
+
+
 def merge_overlaps(events):
     """Uno stesso organizzatore sullo stesso circuito con date che si sovrappongono
     (turno intero, formula compatta, corsi) diventa un'unica voce con l'intervallo piu' largo."""
@@ -488,7 +528,7 @@ def merge_overlaps(events):
 def _merge(cur):
     if len(cur) == 1:
         return cur[0]
-    pr = lambda e: PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99
+    pr = lambda e: PRIORITY.index(e.get("src")) if e.get("src") in PRIORITY else 99
     base = dict(sorted(cur, key=pr)[0])
     base["start"] = min(x["start"] for x in cur)
     base["end"] = max(x["end"] for x in cur)
@@ -554,8 +594,7 @@ SOURCES = [
     {"id": "rehm", "name": "Rehm Race Days (sito ufficiale)", "urls": ["https://www.rehmracedays.com/it/rehm-race-calendario/"],
      "parse": parse_official("rehm", "https://www.rehmracedays.com/it/rehm-race-calendario/"), "zero_ok": False},
     {"id": "speer", "name": "Speer Racing (sito ufficiale)", "urls": ["https://www.speer-racing.de/en/"],
-     "parse": parse_official("speer", "https://www.speer-racing.de/en/",
-                             ("instruktor", "instructor", "coaching", "schraglagen", "slt ")), "zero_ok": False},
+     "parse": parse_speer, "zero_ok": False},
     {"id": "rehm4f", "name": "Rehm Race Days (via Racing4Fun)", "urls": ["https://www.racing4fun.de/veranstalter/rehm-race-days/"],
      "parse": parse_racing4fun("rehm", "https://www.racing4fun.de/veranstalter/rehm-race-days/"), "zero_ok": True},
     {"id": "speer4f", "name": "Speer Racing (via Racing4Fun)", "urls": ["https://www.racing4fun.de/veranstalter/speer-racing-gmbh/"],
@@ -567,6 +606,7 @@ SOURCES = [
               "https://mugellocircuit.com/en/events/bike-free-practices?start=20"],
      "parse": parse_mugello, "zero_ok": True},
 ]
+FALLBACK = {"rehm4f": "rehm", "speer4f": "speer"}
 # Gli eventi dei siti degli organizzatori hanno la precedenza su quelli del Mugello.
 PRIORITY = ["rf", "gully", "promo", "rosso", "rehm", "speer", "rehm4f", "speer4f", "cremona", "mugello"]
 
@@ -629,6 +669,9 @@ def collect(today, fetcher=fetch, previous=None):
 
     # niente doppioni: vale la prima fonte in ordine di priorita'
     events.sort(key=lambda e: (PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99, e["start"]))
+    # il portale Racing4Fun serve solo se il sito ufficiale non e' stato letto
+    primary_ok = {x["id"] for x in statuses if x["status"] == "ok"}
+    events = [e for e in events if not (e["src"] in FALLBACK and FALLBACK[e["src"]] in primary_ok)]
     merged = [e for e in events if e["org"] in ("rehm", "speer")]
     events = [e for e in events if e["org"] not in ("rehm", "speer")] + merge_overlaps(merged)
     events.sort(key=lambda e: (PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99, e["start"]))

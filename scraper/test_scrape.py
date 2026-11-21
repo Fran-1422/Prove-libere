@@ -125,25 +125,37 @@ REHM_OFF = "<html><body>" + "".join(
     '<a href="https://maps.google.com/?q=Most">Maps</a></section>' % r for r in REHM_OFF_ROWS) + "</body></html>"
 
 SPEER_OFF_ROWS = [
-    ("03.–05.01.2027", "Valencia 1 - all inclusive", "Sportfahrertraining", "€ 1.485,54"),
-    ("03.–05.01.2027", "Valencia 1", "Sportfahrertraining", "€ 741,60"),
-    ("04.–05.01.2027", "Valencia 1 - compact", "Sportfahrertraining", "€ 535,60"),
-    ("17.–20.03.2027", "Calafat", "Freies Fahren", "€ 669,49"),
-    ("17.–19.03.2027", "Calafat GirlsCamp", "Girls Camp", "€ 617,44"),
-    ("20.03.2027", "Calafat 20.3.", "Freies Fahren", "€ 174,60"),
-    ("26.03.2027", "Anneau du Rhin", "Sportfahrertraining", "€ 264,18"),
-    ("27.03.2027", "Instructortraining light", "Instruktorentraining light", "€ 149,99"),
-    ("27.03.2027", "Anneau du Rhin 1:1 light", "1:1 Coaching", "€ 350,00"),
-    ("29.03.2027", "Hockenheim", "Instruktorentraining", "€ 281,30"),
-    ("22.05.2027", "SLT 22.5. vormittag", "Schräglagentraining", "€ 106,70"),
-    ("22.05.2027", "Hockenheim", "Sportfahrertraining", "€ 271,60"),
-    ("02.–04.07.2027", "Mugello 1 - 3 days", "Sportfahrertraining", "€ 999,10"),
-    ("03.–04.07.2027", "Assen (lista d'attesa)", "Sportfahrertraining", "€ 599,46"),
-    ("30.07.–01.08.2027", "Brünn", "Sportfahrertraining", "€ 799,99"),
+    ("03. - 05. Jan 2027", "Valencia 1 - all inclusive", "Sportfahrertraining", "Valencia - Full Circuit", "1.485.54"),
+    ("03. - 05. Jan 2027", "Valencia 1", "Sportfahrertraining", "Valencia - Full Circuit", "741.60"),
+    ("04. - 05. Jan 2027", "Valencia 1 - compact", "Sportfahrertraining", "Valencia - Full Circuit", "535.60"),
+    ("17. - 20. Mar 2027", "Calafat", "Freies Fahren", "Calafat", "669.49"),
+    ("17. - 19. Mar 2027", "Calafat GirlsCamp", "Girls Camp", "Calafat", "617.44"),
+    ("20. Mar 2027", "Calafat 20.3.", "Freies Fahren", "Calafat", "174.60"),
+    ("26. Mar 2027", "Anneau du Rhin", "Sportfahrertraining", "Anneau du Rhin - 3.0", "264.18"),
+    ("27. Mar 2027", "Instructortraining light", "Instruktorentraining light", "Anneau du Rhin - 3.0", "149.99"),
+    ("27. Mar 2027", "Anneau du Rhin 1:1 light", "1:1 Coaching", "Anneau du Rhin - 3.0", "350.00"),
+    ("29. Mar 2027", "Hockenheim", "Instruktorentraining", "Hockenheim - Grand-Prix-Kurs", "281.30"),
+    ("22. May 2027", "SLT 22.5. vormittag", "Schr\u00e4glagentraining", "Hockenheim", "106.70"),
+    ("22. May 2027", "Hockenheim", "Sportfahrertraining", "Hockenheim - IDM-Kurs", "271.60"),
+    ("02. - 04. Jul 2027", "Mugello 1 - 3 days", "Sportfahrertraining", "Mugello - Full Circuit", "999.10"),
+    ("03. - 04. Jul 2027", "Assen", "Sportfahrertraining", "Assen - Full Circuit", "599.46"),
+    ("10. - 12. Sept 2027", "Mugello 2 - 3 days", "Sportfahrertraining", "Mugello - Full Circuit", "999.10"),
+    ("30. Jul - 01. Aug 2027", "Br\u00fcnn", "Sportfahrertraining", "Br\u00fcnn", "799.99"),
 ]
-SPEER_OFF = "<html><body><h2>Booking</h2>" + "".join(
-    '<div class="card"><span>%s</span><h3>%s</h3><span>%s</span><span>%s</span><a href="#">Info</a><a href="#">Book now</a></div>' % r
-    for r in SPEER_OFF_ROWS) + "</body></html>"
+
+
+def _tile(d, title, cat, circ, price):
+    shown = d.replace(" - ", "\n -\n ", 1)
+    return ('<div class="imia_eventTile"><p class="date">\n%s\n</p><p class="imia_eventTile__name">\n%s\n</p>'
+            '<p class="imia_eventTile__trackday">\n%s\n</p><div>speerkompass</div><p>%s</p><p>105 dB</p>'
+            '<p>\u20ac\u00a0</p><p>%s</p><a href="https://api.pgm.speer-racing.com/t.pdf">Schedule</a><p>Available</p>'
+            '<a href="/en/booking/event/1/">Info</a><a href="/en/booking/event/1/step/1/">Book now</a></div>'
+            '<div class="imia_eventTile"><p>%s</p><p>%s</p><p>%s</p><div>speerkompass</div><p>On-site services</p>'
+            '<p>55moto Transport \u20ac 160.00</p><a href="#">Info</a><a href="#">Book now</a></div>') % (shown, title, cat, circ, price, d, title, cat)
+
+
+SPEER_OFF = "<html><body><h2>Booking</h2><p>No events found</p>" + "".join(_tile(*r) for r in SPEER_OFF_ROWS) + "</body></html>"
+
 
 
 def fake(pages):
@@ -234,12 +246,12 @@ class Parsers(unittest.TestCase):
         self.assertEqual(ev[3]["price"], "")
 
     def test_speer_ufficiale_scarta_coaching_e_corsi(self):
-        ev = scrape.parse_official("speer", "https://www.speer-racing.de/en/",
-                                   ("instruktor", "instructor", "coaching", "schraglagen", "slt "))(SPEER_OFF, TODAY)
-        self.assertEqual(len(ev), 11)
-        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["price"]), ("2027-01-03", "2027-01-05", "da 1.485 €"))
-        self.assertEqual([e["circuit"] for e in ev][-3:], ["mugello", "assen", "brno"])
-        self.assertEqual((ev[-1]["start"], ev[-1]["end"]), ("2027-07-30", "2027-08-01"))
+        ev = scrape.parse_speer(SPEER_OFF, TODAY)
+        self.assertEqual(len(ev), 12)
+        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["price"]), ("2027-01-03", "2027-01-05", "da 1485 €"))
+        self.assertEqual((ev[-1]["circuit"], ev[-1]["start"], ev[-1]["end"]), ("brno", "2027-07-30", "2027-08-01"))
+        self.assertIn(("2027-09-10", "2027-09-12"), [(e["start"], e["end"]) for e in ev])
+        self.assertNotIn("1:1", " ".join(e["note"] for e in ev))
 
     def test_anno_dedotto(self):
         self.assertEqual(scrape.infer_year(2, 5, dt.date(2026, 11, 20)), 2027)
@@ -249,7 +261,7 @@ class Parsers(unittest.TestCase):
 class Raccolta(unittest.TestCase):
     def test_tutto_ok(self):
         r = scrape.collect(TODAY, fake(full()))
-        self.assertEqual(len(r["events"]), 36)
+        self.assertEqual(len(r["events"]), 34)
         self.assertEqual([e["start"] for e in r["events"]], sorted(e["start"] for e in r["events"]))
         st = {s["id"]: s for s in r["sources"]}
         self.assertEqual(st["rf"]["status"], "ok")
@@ -259,19 +271,19 @@ class Raccolta(unittest.TestCase):
     def test_sito_non_raggiungibile_conserva_le_date(self):
         prima = scrape.collect(TODAY, fake(full()))
         dopo = scrape.collect(TODAY, fake(full(racingfactory=OSError("timeout"))), previous=prima)
-        self.assertEqual(len(dopo["events"]), 36)
+        self.assertEqual(len(dopo["events"]), 34)
         self.assertEqual({s["id"]: s for s in dopo["sources"]}["rf"]["status"], "errore")
 
     def test_struttura_cambiata_conserva_le_date(self):
         prima = scrape.collect(TODAY, fake(full()))
         dopo = scrape.collect(TODAY, fake(full(gullyracing="<html><body>Nuovo sito</body></html>")), previous=prima)
-        self.assertEqual(len(dopo["events"]), 36)
+        self.assertEqual(len(dopo["events"]), 34)
         self.assertEqual({s["id"]: s for s in dopo["sources"]}["gully"]["status"], "da_controllare")
 
     def test_date_passate_scompaiono(self):
         r = scrape.collect(dt.date(2027, 3, 1), fake(full()))
         self.assertTrue(all(e["end"] >= "2027-03-01" for e in r["events"]))
-        self.assertLess(len(r["events"]), 36)
+        self.assertLess(len(r["events"]), 34)
 
     def test_turni_sovrapposti_diventano_uno(self):
         r = scrape.collect(TODAY, fake(full()))
@@ -284,7 +296,13 @@ class Raccolta(unittest.TestCase):
         cal = [e for e in sp if e["circuit"] == "calafat"]
         self.assertEqual((len(cal), cal[0]["start"], cal[0]["end"]), (1, "2027-03-17", "2027-03-20"))
         anneau = [e for e in sp if e["circuit"] == "anneau-du-rhin" and e["start"].startswith("2027-03")]
-        self.assertEqual((len(anneau), anneau[0]["start"], anneau[0]["end"]), (1, "2027-03-26", "2027-03-27"))
+        self.assertEqual((len(anneau), anneau[0]["start"], anneau[0]["end"]), (1, "2027-03-26", "2027-03-26"))
+
+    def test_racing4fun_solo_se_il_sito_ufficiale_non_va(self):
+        ok = scrape.collect(TODAY, fake(full()))
+        self.assertFalse([e for e in ok["events"] if e["src"] in ("rehm4f", "speer4f")])
+        rotto = scrape.collect(TODAY, fake(full(**{"speer-racing.de": "<html>nuovo</html>"})))
+        self.assertTrue([e for e in rotto["events"] if e["src"] == "speer4f"])
 
     def test_doppioni_mugello(self):
         pages = full(mugellocircuit=MUGELLO)
