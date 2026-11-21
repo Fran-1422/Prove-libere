@@ -227,11 +227,13 @@ function renderFilters() {
   dropdown($("fn"), "countries", "Tutte", "nazioni", ccs.map((cc) => ({
     value: cc, label: (flag(cc) ? flag(cc) + " " : "") + nationName(cc), n: DATA.events.filter((e) => evCountry(e) === cc).length,
   })), DATA.events.length);
-  const shown = DATA.circuits.filter((c) => !state.countries.size || state.countries.has(c.country));
+  const shown = DATA.circuits.filter((c) => !state.countries.size || state.countries.has(c.country))
+    .sort((x, y) => x.name.localeCompare(y.name, "it", { sensitivity: "base" }));
   dropdown($("fc"), "circuits", "Tutti", "circuiti", shown.map((c) => ({
     value: c.id, label: c.name + (c.country ? " · " + c.country : ""), n: DATA.events.filter((e) => e.circuit === c.id).length,
   })), DATA.events.filter((e) => !state.countries.size || state.countries.has(evCountry(e))).length);
-  const orgs = [...new Set([...Object.keys(DATA.orgs), ...DATA.events.map((e) => e.org)])].filter((o) => o !== "altro" || DATA.events.some((e) => e.org === "altro"));
+  const orgs = [...new Set([...Object.keys(DATA.orgs), ...DATA.events.map((e) => e.org)])].filter((o) => o !== "altro" || DATA.events.some((e) => e.org === "altro"))
+    .sort((x, y) => (x === "altro") - (y === "altro") || orgName(x).localeCompare(orgName(y), "it", { sensitivity: "base" }));
   dropdown($("fo"), "orgs", "Tutti", "organizzatori", orgs.map((o) => ({
     value: o, label: orgName(o), n: DATA.events.filter((e) => e.org === o).length, color: orgColor(o),
   })), DATA.events.length);
