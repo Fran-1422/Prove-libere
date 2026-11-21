@@ -1,11 +1,13 @@
 {
- "checked": "2026-11-21",
+ "checked": "2026-11-20",
  "orgs": {
   "rf": "Racing Factory",
   "gully": "Gully Racing",
   "promo": "Promo Racing",
   "rosso": "Rosso Corsa",
   "cremona": "Cremona Circuit",
+  "rehm": "Rehm Race Days",
+  "speer": "Speer Racing",
   "altro": "Altro organizzatore"
  },
  "circuits": [
@@ -40,9 +42,59 @@
    "country": "ES"
   },
   {
+   "id": "aragon",
+   "name": "Aragon",
+   "country": "ES"
+  },
+  {
+   "id": "barcellona",
+   "name": "Barcellona",
+   "country": "ES"
+  },
+  {
+   "id": "cartagena",
+   "name": "Cartagena",
+   "country": "ES"
+  },
+  {
    "id": "portimao",
    "name": "Portimão",
    "country": "PT"
+  },
+  {
+   "id": "brno",
+   "name": "Brno",
+   "country": "CZ"
+  },
+  {
+   "id": "rijeka",
+   "name": "Rijeka",
+   "country": "HR"
+  },
+  {
+   "id": "monteblanco",
+   "name": "Monteblanco",
+   "country": "ES"
+  },
+  {
+   "id": "anneau-du-rhin",
+   "name": "Anneau du Rhin",
+   "country": "FR"
+  },
+  {
+   "id": "hockenheim",
+   "name": "Hockenheim",
+   "country": "DE"
+  },
+  {
+   "id": "assen",
+   "name": "Assen",
+   "country": "NL"
+  },
+  {
+   "id": "calafat",
+   "name": "Calafat",
+   "country": "ES"
   }
  ],
  "sources": [
@@ -53,7 +105,7 @@
    "status": "ok",
    "count": 7,
    "message": "",
-   "checked": "2026-11-21"
+   "checked": "2026-11-20"
   },
   {
    "id": "gully",
@@ -62,7 +114,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-21"
+   "checked": "2026-11-20"
   },
   {
    "id": "promo",
@@ -71,7 +123,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-21"
+   "checked": "2026-11-20"
   },
   {
    "id": "rosso",
@@ -79,6 +131,42 @@
    "url": "https://www.rossocorsaonline.com/prove",
    "status": "ok",
    "count": 2,
+   "message": "",
+   "checked": "2026-11-20"
+  },
+  {
+   "id": "rehm",
+   "name": "Rehm Race Days (sito ufficiale)",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "status": "ok",
+   "count": 12,
+   "message": "",
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "speer",
+   "name": "Speer Racing (sito ufficiale)",
+   "url": "https://www.speer-racing.de/en/",
+   "status": "ok",
+   "count": 11,
+   "message": "",
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "rehm4f",
+   "name": "Rehm Race Days (via Racing4Fun)",
+   "url": "https://www.racing4fun.de/veranstalter/rehm-race-days/",
+   "status": "ok",
+   "count": 12,
+   "message": "",
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "speer4f",
+   "name": "Speer Racing (via Racing4Fun)",
+   "url": "https://www.racing4fun.de/veranstalter/speer-racing-gmbh/",
+   "status": "ok",
+   "count": 11,
    "message": "",
    "checked": "2026-11-21"
   },
@@ -89,7 +177,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-21"
+   "checked": "2026-11-20"
   },
   {
    "id": "mugello",
@@ -98,10 +186,114 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-21"
+   "checked": "2026-11-20"
   }
  ],
  "events": [
+  {
+   "id": "rehm-barcellona-2026-11-26",
+   "start": "2026-11-26",
+   "end": "2026-11-27",
+   "circuit": "barcellona",
+   "circuit_name": "Barcellona",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 640 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-cartagena-2026-12-22",
+   "start": "2026-12-22",
+   "end": "2026-12-25",
+   "circuit": "cartagena",
+   "circuit_name": "Cartagena",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 540 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-cartagena-2026-12-27",
+   "start": "2026-12-27",
+   "end": "2026-12-31",
+   "circuit": "cartagena",
+   "circuit_name": "Cartagena",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 760 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-valencia-2026-12-27",
+   "start": "2026-12-27",
+   "end": "2026-12-31",
+   "circuit": "valencia",
+   "circuit_name": "Valencia",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 540 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-cartagena-2027-01-02",
+   "start": "2027-01-02",
+   "end": "2027-01-05",
+   "circuit": "cartagena",
+   "circuit_name": "Cartagena",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 590 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "speer-valencia-2027-01-03",
+   "start": "2027-01-03",
+   "end": "2027-01-05",
+   "circuit": "valencia",
+   "circuit_name": "Valencia",
+   "country": "ES",
+   "org": "speer",
+   "price": "da 535 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
+  },
+  {
+   "id": "rehm-monteblanco-2027-01-18",
+   "start": "2027-01-18",
+   "end": "2027-01-20",
+   "circuit": "monteblanco",
+   "circuit_name": "Monteblanco",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 630 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-jerez-2027-01-22",
+   "start": "2027-01-22",
+   "end": "2027-01-24",
+   "circuit": "jerez",
+   "circuit_name": "Jerez",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 790 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
   {
    "id": "rosso-valencia-2027-02-05",
    "start": "2027-02-05",
@@ -142,6 +334,19 @@
    "src": "rf"
   },
   {
+   "id": "rehm-cartagena-2027-02-26",
+   "start": "2027-02-26",
+   "end": "2027-02-28",
+   "circuit": "cartagena",
+   "circuit_name": "Cartagena",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 480 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
    "id": "gully-valencia-2027-02-26",
    "start": "2027-02-26",
    "end": "2027-02-28",
@@ -166,6 +371,19 @@
    "note": "",
    "url": "https://www.rossocorsaonline.com/prove/detail/393",
    "src": "rosso"
+  },
+  {
+   "id": "speer-calafat-2027-03-17",
+   "start": "2027-03-17",
+   "end": "2027-03-20",
+   "circuit": "calafat",
+   "circuit_name": "Calafat",
+   "country": "ES",
+   "org": "speer",
+   "price": "da 174 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "promo-jerez-2027-03-19",
@@ -194,6 +412,32 @@
    "src": "rf"
   },
   {
+   "id": "speer-anneau-du-rhin-2027-03-26",
+   "start": "2027-03-26",
+   "end": "2027-03-27",
+   "circuit": "anneau-du-rhin",
+   "circuit_name": "Anneau du Rhin",
+   "country": "FR",
+   "org": "speer",
+   "price": "da 264 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
+  },
+  {
+   "id": "rehm-rijeka-2027-03-26",
+   "start": "2027-03-26",
+   "end": "2027-03-28",
+   "circuit": "rijeka",
+   "circuit_name": "Rijeka",
+   "country": "HR",
+   "org": "rehm",
+   "price": "da 590 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
    "id": "rf-cremona-2027-03-29",
    "start": "2027-03-29",
    "end": "2027-03-29",
@@ -205,6 +449,46 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-cremona-29-marzo-2027/",
    "src": "rf"
+  },
+  {
+   "id": "speer-hockenheim-2027-03-29-94531",
+   "start": "2027-03-29",
+   "end": "2027-03-29",
+   "circuit": "hockenheim",
+   "circuit_name": "Hockenheim",
+   "country": "DE",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/94531/",
+   "uid": "94531",
+   "src": "speer4f"
+  },
+  {
+   "id": "rehm-portimao-2027-04-03",
+   "start": "2027-04-03",
+   "end": "2027-04-05",
+   "circuit": "portimao",
+   "circuit_name": "Portimão",
+   "country": "PT",
+   "org": "rehm",
+   "price": "da 890 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "rehm-aragon-2027-04-22",
+   "start": "2027-04-22",
+   "end": "2027-04-24",
+   "circuit": "aragon",
+   "circuit_name": "Aragon",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 840 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
   },
   {
    "id": "rf-cremona-2027-04-25",
@@ -220,6 +504,46 @@
    "src": "rf"
   },
   {
+   "id": "rehm-barcellona-2027-04-27",
+   "start": "2027-04-27",
+   "end": "2027-04-29",
+   "circuit": "barcellona",
+   "circuit_name": "Barcellona",
+   "country": "ES",
+   "org": "rehm",
+   "price": "da 970 €",
+   "note": "",
+   "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
+   "src": "rehm"
+  },
+  {
+   "id": "speer-anneau-du-rhin-2027-04-30-92347",
+   "start": "2027-04-30",
+   "end": "2027-05-01",
+   "circuit": "anneau-du-rhin",
+   "circuit_name": "Anneau du Rhin",
+   "country": "FR",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/92347/",
+   "uid": "92347",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-hockenheim-2027-05-22",
+   "start": "2027-05-22",
+   "end": "2027-05-22",
+   "circuit": "hockenheim",
+   "circuit_name": "Hockenheim",
+   "country": "DE",
+   "org": "speer",
+   "price": "da 271 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
+  },
+  {
    "id": "rf-misano-2027-06-01",
    "start": "2027-06-01",
    "end": "2027-06-01",
@@ -231,6 +555,58 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-moto-misano-circuit-1-giugno-2027/",
    "src": "rf"
+  },
+  {
+   "id": "speer-mugello-2027-07-02",
+   "start": "2027-07-02",
+   "end": "2027-07-04",
+   "circuit": "mugello",
+   "circuit_name": "Mugello",
+   "country": "IT",
+   "org": "speer",
+   "price": "da 999 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
+  },
+  {
+   "id": "speer-assen-2027-07-03",
+   "start": "2027-07-03",
+   "end": "2027-07-04",
+   "circuit": "assen",
+   "circuit_name": "Assen",
+   "country": "NL",
+   "org": "speer",
+   "price": "da 599 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
+  },
+  {
+   "id": "speer-anneau-du-rhin-2027-07-22",
+   "start": "2027-07-22",
+   "end": "2027-07-24",
+   "circuit": "anneau-du-rhin",
+   "circuit_name": "Anneau du Rhin",
+   "country": "FR",
+   "org": "speer",
+   "price": "",
+   "note": "",
+   "url": "https://www.racing4fun.de/event/92355/",
+   "src": "speer4f"
+  },
+  {
+   "id": "speer-brno-2027-07-30",
+   "start": "2027-07-30",
+   "end": "2027-08-01",
+   "circuit": "brno",
+   "circuit_name": "Brno",
+   "country": "CZ",
+   "org": "speer",
+   "price": "da 799 €",
+   "note": "",
+   "url": "https://www.speer-racing.de/en/",
+   "src": "speer"
   },
   {
    "id": "rf-misano-2027-08-29",
