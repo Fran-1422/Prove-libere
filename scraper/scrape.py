@@ -43,8 +43,15 @@ CIRCUITS = [
     ("barcellona", "Barcellona", "ES", ["barcellona", "barcelona", "catalunya"]),
     ("cartagena", "Cartagena", "ES", ["cartagena"]),
     ("portimao", "Portimão", "PT", ["portimao", "algarve"]),
-    ("brno", "Brno", "CZ", ["brno"]),
+    ("brno", "Brno", "CZ", ["brno", "brunn", "bruenn"]),
     ("rijeka", "Rijeka", "HR", ["rijeka"]),
+    ("monteblanco", "Monteblanco", "ES", ["monteblanco"]),
+    ("anneau-du-rhin", "Anneau du Rhin", "FR", ["anneau du rhin", "anneau-du-rhin"]),
+    ("hockenheim", "Hockenheim", "DE", ["hockenheim"]),
+    ("assen", "Assen", "NL", ["assen"]),
+    ("calafat", "Calafat", "ES", ["calafat"]),
+    ("most", "Most", "CZ", ["most"]),
+    ("ledenon", "Ledenon", "FR", ["ledenon"]),
 ]
 ALWAYS_SHOW = ["mugello", "misano", "cremona"]
 
@@ -54,6 +61,8 @@ ORGS = {
     "promo": "Promo Racing",
     "rosso": "Rosso Corsa",
     "cremona": "Cremona Circuit",
+    "rehm": "Rehm Race Days",
+    "speer": "Speer Racing",
     "altro": "Altro organizzatore",
 }
 
@@ -74,10 +83,27 @@ def month_num(name):
     return MESI_IT.get(k) or MESI_EN.get(k)
 
 
+def alias_re(a):
+    # parole corte ("most") solo come parola intera; le altre anche come inizio di parola
+    return r"\b" + re.escape(a) + (r"\b" if len(a) <= 5 else "")
+
+
+def find_circuit(text):
+    """Il circuito nominato per primo nel testo, o None."""
+    t = fold(text)
+    best = None
+    for cid, name, country, aliases in CIRCUITS:
+        for a in aliases:
+            m = re.search(alias_re(a), t)
+            if m and (best is None or m.start() < best[0]):
+                best = (m.start(), (cid, name, country))
+    return best[1] if best else None
+
+
 def canon(text):
     t = fold(text)
     for cid, name, country, aliases in CIRCUITS:
-        if any(a in t for a in aliases):
+        if any(re.search(alias_re(a), t) for a in aliases):
             return cid, name, country
     name = clean(re.sub(r"[-|·,]+", " ", text))[:40].title() or "Altro"
     slug = re.sub(r"[^a-z0-9]+", "-", fold(name)).strip("-") or "altro"
@@ -118,10 +144,10 @@ def money(s):
     return s
 
 
-def event(org, a, b, circuit, price="", note="", url=""):
+def event(org, a, b, circuit, price="", note="", url="", uid=""):
     cid, cname, country = circuit
-    return {
-        "id": "%s-%s-%s" % (org, cid, a.isoformat()),
+    e = {
+        "id": "%s-%s-%s%s" % (org, cid, a.isoformat(), "-" + uid if uid else ""),
         "start": a.isoformat(),
         "end": b.isoformat(),
         "circuit": cid,
@@ -132,6 +158,9 @@ def event(org, a, b, circuit, price="", note="", url=""):
         "note": note,
         "url": url,
     }
+    if uid:
+        e["uid"] = uid
+    return e
 
 
 class Page(HTMLParser):
@@ -393,11 +422,144 @@ def parse_mugello(html, today):
     return out
 
 
+DATE_RE = re.compile(
+    r"(\d{1,2})\.(?:(\d{1,2})\.)?(?:(20\d\d))?\s*[–-]\s*(\d{1,2})\.(\d{1,2})\.(20\d\d)"
+    r"|(\d{1,2})\.(\d{1,2})\.(20\d\d)")
+
+
+def parse_official(org, base, skip_words=(), need_circuit=True):
+    """Sito ufficiale di Rehm o Speer: ogni data (GG.MM.AAAA o intervallo) apre un evento.
+
+    Il circuito e' il primo nominato dopo la data e prima della data successiva;
+    il prezzo e' il primo importo nello stesso tratto. Corsi di sicurezza, coaching
+    e simili si scartano con skip_words.
+    """
+    def parse(html, today):
+        text = re.sub(r"⟦[^⟧]*⟧", " ", page(html, base).text())
+        hits = list(DATE_RE.finditer(text))
+        out = []
+        for i, m in enumerate(hits):
+            seg = text[m.end(): hits[i + 1].start() if i + 1 < len(hits) else len(text)][:260]
+            if m.group(7):
+                a = safe_date(int(m.group(9)), int(m.group(8)), int(m.group(7)))
+                b = a
+            else:
+                y2, m2, d1, d2 = int(m.group(6)), int(m.group(5)), int(m.group(1)), int(m.group(4))
+                m1 = int(m.group(2) or m2)
+                a = safe_date(int(m.group(3) or y2), m1, d1)
+                b = safe_date(y2, m2, d2)
+            if not a or not b or b < a or (b - a).days > 10:
+                continue
+            f = fold(seg)
+            if any(w in f for w in skip_words):
+                continue
+            circ = find_circuit(seg)
+            if not circ:
+                if need_circuit:
+                    continue
+                circ = canon("")
+            pr = re.search(r"€\s*(\d[\d\.]*,\d{2})|(\d[\d\.]*,\d{2})\s*€", seg)
+            price = "da %s €" % money(pr.group(1) or pr.group(2)) if pr else ""
+            out.append(event(org, a, b, circ, price, "", base))
+        return out
+    return parse
+
+
+def merge_overlaps(events):
+    """Uno stesso organizzatore sullo stesso circuito con date che si sovrappongono
+    (turno intero, formula compatta, corsi) diventa un'unica voce con l'intervallo piu' largo."""
+    groups = {}
+    for e in events:
+        groups.setdefault((e["org"], e["circuit"]), []).append(e)
+    out = []
+    for lst in groups.values():
+        lst.sort(key=lambda e: e["start"])
+        cur = [lst[0]]
+        for e in lst[1:]:
+            if e["start"] <= max(x["end"] for x in cur):
+                cur.append(e)
+            else:
+                out.append(_merge(cur))
+                cur = [e]
+        out.append(_merge(cur))
+    return out
+
+
+def _merge(cur):
+    if len(cur) == 1:
+        return cur[0]
+    pr = lambda e: PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99
+    base = dict(sorted(cur, key=pr)[0])
+    base["start"] = min(x["start"] for x in cur)
+    base["end"] = max(x["end"] for x in cur)
+    base["id"] = "%s-%s-%s" % (base["org"], base["circuit"], base["start"])
+    base.pop("uid", None)
+    prices = []
+    for x in cur:
+        n = re.search(r"(\d[\d\.]*)", x["price"] or "")
+        if n:
+            prices.append(int(n.group(1).replace(".", "")))
+    base["price"] = "da %d €" % min(prices) if prices else ""
+    return base
+
+
+def parse_racing4fun(org, base):
+    """Pagina di un organizzatore sul portale Racing4Fun: una scheda per evento.
+
+    Si tengono le categorie "Renntrainings" (prove in pista) e quelle senza categoria;
+    si scartano corsi di sicurezza, pitbike e simili.
+    """
+    def parse(html, today):
+        text = page(html, base).text()
+        out, seen, prev = [], set(), 0
+        for m in re.finditer(r"⟦([^⟧]*/event/(\d+)/?)⟧", text):
+            href, eid = m.group(1), m.group(2)
+            seg = text[prev:m.start()]
+            prev = m.end()
+            if eid in seen:
+                continue
+            seen.add(eid)
+            d = re.search(r"(\d{1,2})\.(\d{1,2})\.\s*[–-]\s*(\d{1,2})\.(\d{1,2})\.(\d{2,4})", seg)
+            if not d:
+                continue
+            yy = int(d.group(5))
+            year = yy + 2000 if yy < 100 else yy
+            r = make_range(int(d.group(1)), int(d.group(2)), int(d.group(3)), int(d.group(4)), today, year)
+            if not r:
+                continue
+            cat = re.search(r"Kategorie:?\s*([^\n⟦]*)", seg)
+            cat = fold(clean(cat.group(1))) if cat else ""
+            if cat and "renntraining" not in cat:
+                continue
+            tr = re.search(r"⟦[^⟧]*/track/([^⟧/]*)/?⟧\s*([^\n⟦]*)", seg)
+            circ = canon(clean(tr.group(2)) + " " + tr.group(1)) if tr else canon("")
+            title = ""
+            for line in seg.split("\n"):
+                if re.search(r"\d{2}\.\d{2}\.(20\d\d)?\s*$", line.strip()) and " - " in line:
+                    title = clean(re.sub(r"⟦[^⟧]*⟧", " ", line))
+            note = re.sub(r"\s*-\s*\d{1,2}\.[\d\.\s-]*$", "", title)
+            if re.match(r"^\d+ Tage? Sportfahrertraining", note) or re.match(r"^1 Tag Instruktoren- & Sportfahrertraining", note):
+                note = ""
+            note = re.sub(r"\s*-\s*" + re.escape(circ[1]) + r"\s*$", "", note) if note and circ[1] else note
+            out.append(event(org, r[0], r[1], circ, "", note, href, uid=eid))
+        return out
+    return parse
+
+
 SOURCES = [
     {"id": "rf", "name": "Racing Factory", "urls": ["https://www.racingfactory.it/"], "parse": parse_rf, "zero_ok": False},
     {"id": "gully", "name": "Gully Racing", "urls": ["https://www.gullyracing.it/calendario"], "parse": parse_gully, "zero_ok": False},
     {"id": "promo", "name": "Promo Racing", "urls": ["https://www.promoracing.it/it/calendario/moto"], "parse": parse_promo, "zero_ok": False},
     {"id": "rosso", "name": "Rosso Corsa", "urls": ["https://www.rossocorsaonline.com/prove"], "parse": parse_rosso, "zero_ok": False},
+    {"id": "rehm", "name": "Rehm Race Days (sito ufficiale)", "urls": ["https://www.rehmracedays.com/it/rehm-race-calendario/"],
+     "parse": parse_official("rehm", "https://www.rehmracedays.com/it/rehm-race-calendario/"), "zero_ok": False},
+    {"id": "speer", "name": "Speer Racing (sito ufficiale)", "urls": ["https://www.speer-racing.de/en/"],
+     "parse": parse_official("speer", "https://www.speer-racing.de/en/",
+                             ("instruktor", "instructor", "coaching", "schraglagen", "slt ")), "zero_ok": False},
+    {"id": "rehm4f", "name": "Rehm Race Days (via Racing4Fun)", "urls": ["https://www.racing4fun.de/veranstalter/rehm-race-days/"],
+     "parse": parse_racing4fun("rehm", "https://www.racing4fun.de/veranstalter/rehm-race-days/"), "zero_ok": True},
+    {"id": "speer4f", "name": "Speer Racing (via Racing4Fun)", "urls": ["https://www.racing4fun.de/veranstalter/speer-racing-gmbh/"],
+     "parse": parse_racing4fun("speer", "https://www.racing4fun.de/veranstalter/speer-racing-gmbh/"), "zero_ok": True},
     {"id": "cremona", "name": "Cremona Circuit (sito ufficiale)", "urls": ["https://cremonacircuit.it/en/booking/"], "parse": parse_cremona, "zero_ok": True},
     {"id": "mugello", "name": "Mugello Circuit (sito ufficiale)",
      "urls": ["https://mugellocircuit.com/en/events/bike-free-practices",
@@ -406,7 +568,7 @@ SOURCES = [
      "parse": parse_mugello, "zero_ok": True},
 ]
 # Gli eventi dei siti degli organizzatori hanno la precedenza su quelli del Mugello.
-PRIORITY = ["rf", "gully", "promo", "rosso", "cremona", "mugello"]
+PRIORITY = ["rf", "gully", "promo", "rosso", "rehm", "speer", "rehm4f", "speer4f", "cremona", "mugello"]
 
 
 # ---------------------------------------------------------------- raccolta
@@ -467,9 +629,12 @@ def collect(today, fetcher=fetch, previous=None):
 
     # niente doppioni: vale la prima fonte in ordine di priorita'
     events.sort(key=lambda e: (PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99, e["start"]))
+    merged = [e for e in events if e["org"] in ("rehm", "speer")]
+    events = [e for e in events if e["org"] not in ("rehm", "speer")] + merge_overlaps(merged)
+    events.sort(key=lambda e: (PRIORITY.index(e["src"]) if e["src"] in PRIORITY else 99, e["start"]))
     seen, uniq = set(), []
     for e in events:
-        k = (e["org"], e["circuit"], e["start"])
+        k = e["id"] if e.get("uid") else (e["org"], e["circuit"], e["start"])
         if k in seen:
             continue
         seen.add(k)

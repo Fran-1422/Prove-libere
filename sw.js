@@ -1,6 +1,7 @@
-// Service worker: l'app funziona anche senza rete. Le date (data.json) si cercano sempre
-// prima in rete e, se manca la connessione, si usa l'ultima copia salvata.
-const CACHE = "prove-libere-v1";
+// Service worker: l'app funziona anche senza rete. Pagina e date si cercano sempre prima
+// in rete (cosi' gli aggiornamenti arrivano subito) e, se manca la connessione, si usa
+// l'ultima copia salvata.
+const CACHE = "prove-libere-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
@@ -28,10 +29,11 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   e.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      const copy = res.clone();
-      caches.open(CACHE).then((c) => c.put(req, copy));
-      return res;
-    }))
+    fetch(req, { cache: "no-cache" })
+      .then((res) => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+        return res;
+      })
+      .catch(() => caches.match(req).then((hit) => hit || caches.match("./")))
   );
 });

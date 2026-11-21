@@ -56,5 +56,6 @@ Ogni sito ha una struttura diversa e può cambiarla. In quel caso:
 ## Limiti da sapere
 
 - Il programma è stato provato su pagine ricostruite dal testo dei siti, non sulle pagine vere, perché dall'ambiente in cui l'ho scritto non potevo raggiungerle. Il primo giorno controlla le date confrontandole con i siti.
+- Rehm e Speer sono letti dai loro siti ufficiali; se un sito non risponde si usa come riserva il portale Racing4Fun. Turni sovrapposti dello stesso circuito (formula compatta, camp) diventano una sola voce, con il prezzo più basso. Per Speer sono esclusi corsi istruttori, coaching 1:1 e corsi di piega.
 - Il calendario provvisorio 2027 di Rosso Corsa è un PDF immagine e non viene letto.
 - Cremona Circuit mostra sul proprio sito solo il mese corrente: le date dei mesi successivi arrivano dagli organizzatori.

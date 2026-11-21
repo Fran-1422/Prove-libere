@@ -64,6 +64,88 @@ MUGELLO = """<html><body><h4>12.12.2026 - 13.12.2026</h4><h2><a href="/en/events
 <h4>20.12.2026</h4><h2><a href="/en/events/bike-free-practices/details/2026-12-20/1901-pistenclub">Pistenclub</a></h2></body></html>"""
 
 
+def card(org, title, date, place, slug, cat, eid):
+    return ('<div class="event"><img src="/logo.png"><a href="/veranstalter/%s/">%s</a>'
+            '<h3>%s</h3><span>%s</span><a href="/track/%s/">%s</a><span>%s</span>'
+            '<img src="/i1.png"><img src="/i2.png">'
+            '<p>Veranstalter: <a href="/veranstalter/%s/">%s</a></p><p>Kategorie: <span>%s</span></p>'
+            '<a href="https://www.racing4fun.de/event/%s/">Details</a></div>') % (org, org, title, date, slug, place, cat, org, org, cat, eid)
+
+
+SPEER_ROWS = [
+    ("3 Tage Sportfahrertraining - Valencia - 03.01. - 05.01.2027", "03.01. – 05.01.27 (So - Di)", "Valencia", "valencia", "Renntrainings", "94817"),
+    ("2 Tage Sportfahrertraining - Anneau du Rhin - 26.-27.03.2027", "26.03. – 27.03.27 (Fr - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92339"),
+    ("Instruktorentraining light - Anneau du Rhin - 27.03.2027", "27.03. – 27.03.27 (Sa - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Sicherheitstrainings", "92341"),
+    ("Anneau du Rhin goes Classic - 27.03.2027", "27.03. – 27.03.27 (Sa - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92343"),
+    ("1 Tag Instruktoren- & Sportfahrertraining - Hockenheimring GP - 29.03.2027", "29.03. – 29.03.27 (Mo - Mo)", "Hockenheimring GP", "hockenheimring-gp", "Renntrainings", "94531"),
+    ("2 Tage Sportfahrertraining - Anneau du Rhin - 30.04. - 01.05.2027", "30.04. – 01.05.27 (Fr - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92347"),
+    ("1 Tag Instruktorentraining - Anneau du Rhin - 30.04.2027", "30.04. – 30.04.27 (Fr - Fr)", "Anneau du Rhin", "anneau-du-rhin", "Sicherheitstrainings", "92353"),
+    ("Instruktorentraining light - Anneau du Rhin - 01.05.2027", "01.05. – 01.05.27 (Sa - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Sicherheitstrainings", "92351"),
+    ("2 Tage Sportfahrertraining - Assen - 03.07. - 04.07.2027", "03.07. – 04.07.27 (Sa - So)", "Assen", "assen", "Renntrainings", "94514"),
+    ("1 Tag Instruktorentraining - Assen - 03.07.2027", "03.07. – 03.07.27 (Sa - Sa)", "Assen", "assen", "Sicherheitstrainings", "94517"),
+    ("3 Tage Sportfahrertraining - Anneau du Rhin - 22.07. - 24.07.2027", "22.07. – 24.07.27 (Do - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92355"),
+    ("2 Tage RookieCamp - Anneau du Rhin - 22.07. - 23.07.2027", "22.07. – 23.07.27 (Do - Fr)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92357"),
+    ("2 Tage GirlsCamp - Anneau du Rhin - 22.07. - 23.07.2027", "22.07. – 23.07.27 (Do - Fr)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92359"),
+    ("Anneau du Rhin goes Classic - 24.07.2027", "24.07. – 24.07.27 (Sa - Sa)", "Anneau du Rhin", "anneau-du-rhin", "Renntrainings", "92363"),
+    ("3 Tage Sportfahrertraining - Brünn - 30.07. - 01.08.2027", "30.07. – 01.08.27 (Fr - So)", "Brünn", "bruenn", "Renntrainings", "94524"),
+]
+REHM_ROWS = [
+    ("Barcelona", "26.11. – 27.11.26 (Do - Fr)", "Barcelona", "barcelona", "Renntrainings", "75310"),
+    ("Cartagena III", "22.12. – 25.12.26 (Di - Fr)", "Cartagena", "cartagena", "Renntrainings", "75311"),
+    ("Cartagena IV", "27.12. – 31.12.26 (So - Do)", "Cartagena", "cartagena", "Renntrainings", "75312"),
+    ("Valencia II", "27.12. – 31.12.26 (So - Do)", "Valencia", "valencia", "Renntrainings", "75313"),
+    ("Cartagena I", "02.01. – 05.01.27 (Sa - Di)", "Cartagena", "cartagena", "Renntrainings", "75314"),
+    ("Monteblanco", "18.01. – 20.01.27 (Mo - Mi)", "Monteblanco", "monteblanco", "Renntrainings", "89058"),
+    ("Jerez I", "22.01. – 24.01.27 (Fr - So)", "Jerez", "jerez", "", "89059"),
+    ("Cartagena II", "26.02. – 28.02.27 (Fr - So)", "Cartagena", "cartagena", "Renntrainings", "91944"),
+    ("Rijeka I", "26.03. – 28.03.27 (Fr - So)", "Rijeka", "rijeka", "", "89063"),
+    ("Portimao I", "03.04. – 05.04.27 (Sa - Mo)", "Portimao", "portimao", "Renntrainings", "92654"),
+    ("Aragon I", "22.04. – 24.04.27 (Do - Sa)", "Aragon", "aragon", "Renntrainings", "94754"),
+    ("Barcelona", "27.04. – 29.04.27 (Di - Do)", "Barcelona", "barcelona", "Renntrainings", "94755"),
+]
+SPEER = "<html><body><h1>Speer Racing GmbH</h1>" + "".join(card("speer-racing-gmbh", *r[:1], *r[1:]) for r in SPEER_ROWS) + "</body></html>"
+REHM = "<html><body><h1>Rehm Race Days</h1>" + "".join(card("rehm-race-days", *r) for r in REHM_ROWS) + "</body></html>"
+
+
+REHM_OFF_ROWS = [
+    ("04.09.2026 – 06.09.2026", "Tazio Nuvolari 5260", ""), ("11.09.2026 – 13.09.2026", "Rijeka II", ""),
+    ("18.09.2026 – 20.09.2026", "Most", ""), ("02.10.2026 – 04.10.2026", "Ledenon", ""),
+    ("07.10.2026 – 09.10.2026", "Valencia I", ""), ("04.11.2026 – 06.11.2026", "Aragon II", ""),
+    ("18.11.2026 – 20.11.2026", "Jerez II", ""), ("26.11.2026 – 27.11.2026", "Barcelona", "640,00 €"),
+    ("22.12.2026 – 25.12.2026", "Cartagena III", "540,00 €"), ("27.12.2026 – 31.12.2026", "Cartagena IV", "760,00 €"),
+    ("27.12.2026 – 31.12.2026", "Valencia II", "540,00 € (30-31.12), 790,00 € (27-29.12)"),
+    ("02.01.2027 – 05.01.2027", "Cartagena I", "590,00 €"), ("18.01.2027 – 20.01.2027", "Monteblanco", "630,00 €"),
+    ("22.01.2027 – 24.01.2027", "Jerez I", "790,00 €"), ("26.02.2027 – 28.02.2027", "Cartagena II", "480,00 €"),
+    ("26.03.2027 – 28.03.2027", "Rijeka I", "590,00 €"), ("03.04.2027 – 05.04.2027", "Portimao I", "890,00 €"),
+    ("22.04.2027 – 24.04.2027", "Aragon I", "840,00 €"), ("27.04.2027 – 29.04.2027", "Barcelona", "970,00 €"),
+]
+REHM_OFF = "<html><body>" + "".join(
+    '<section><h3>Event</h3><p>%s</p><p>%s</p><p>Briefing, Races, Endurance 2h</p><p>%s</p>'
+    '<a href="https://www.rehmracedays.com/wp-content/uploads/2026/09/84_Timetable_Tazio_Nuvolari_04.-06.09.2026.pdf" title="Timetable">Timetable</a>'
+    '<a href="https://maps.google.com/?q=Most">Maps</a></section>' % r for r in REHM_OFF_ROWS) + "</body></html>"
+
+SPEER_OFF_ROWS = [
+    ("03.–05.01.2027", "Valencia 1 - all inclusive", "Sportfahrertraining", "€ 1.485,54"),
+    ("03.–05.01.2027", "Valencia 1", "Sportfahrertraining", "€ 741,60"),
+    ("04.–05.01.2027", "Valencia 1 - compact", "Sportfahrertraining", "€ 535,60"),
+    ("17.–20.03.2027", "Calafat", "Freies Fahren", "€ 669,49"),
+    ("17.–19.03.2027", "Calafat GirlsCamp", "Girls Camp", "€ 617,44"),
+    ("20.03.2027", "Calafat 20.3.", "Freies Fahren", "€ 174,60"),
+    ("26.03.2027", "Anneau du Rhin", "Sportfahrertraining", "€ 264,18"),
+    ("27.03.2027", "Instructortraining light", "Instruktorentraining light", "€ 149,99"),
+    ("27.03.2027", "Anneau du Rhin 1:1 light", "1:1 Coaching", "€ 350,00"),
+    ("29.03.2027", "Hockenheim", "Instruktorentraining", "€ 281,30"),
+    ("22.05.2027", "SLT 22.5. vormittag", "Schräglagentraining", "€ 106,70"),
+    ("22.05.2027", "Hockenheim", "Sportfahrertraining", "€ 271,60"),
+    ("02.–04.07.2027", "Mugello 1 - 3 days", "Sportfahrertraining", "€ 999,10"),
+    ("03.–04.07.2027", "Assen (lista d'attesa)", "Sportfahrertraining", "€ 599,46"),
+    ("30.07.–01.08.2027", "Brünn", "Sportfahrertraining", "€ 799,99"),
+]
+SPEER_OFF = "<html><body><h2>Booking</h2>" + "".join(
+    '<div class="card"><span>%s</span><h3>%s</h3><span>%s</span><span>%s</span><a href="#">Info</a><a href="#">Book now</a></div>' % r
+    for r in SPEER_OFF_ROWS) + "</body></html>"
+
+
 def fake(pages):
     def f(url):
         for k, v in pages.items():
@@ -77,6 +159,8 @@ def fake(pages):
 
 def full(**over):
     pages = {"racingfactory": RF, "gullyracing": GULLY, "promoracing": PROMO, "rossocorsa": ROSSO,
+             "racing4fun.de/veranstalter/rehm": REHM, "racing4fun.de/veranstalter/speer": SPEER,
+             "rehmracedays": REHM_OFF, "speer-racing.de": SPEER_OFF,
              "cremonacircuit": CREMONA_VUOTO, "mugellocircuit": "<html><body>nessun evento</body></html>"}
     pages.update(over)
     return pages
@@ -123,6 +207,40 @@ class Parsers(unittest.TestCase):
         self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["org"]), ("2026-12-12", "2026-12-13", "promo"))
         self.assertEqual((ev[1]["org"], ev[1]["note"]), ("altro", "Pistenclub"))
 
+    def test_rehm(self):
+        ev = scrape.parse_racing4fun("rehm", "https://www.racing4fun.de/veranstalter/rehm-race-days/")(REHM, TODAY)
+        self.assertEqual(len(ev), 12)
+        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["circuit"]), ("2026-11-26", "2026-11-27", "barcellona"))
+        self.assertEqual(ev[0]["url"], "https://www.racing4fun.de/event/75310/")
+        self.assertEqual([e["circuit"] for e in ev][5:9], ["monteblanco", "jerez", "cartagena", "rijeka"])
+
+    def test_speer_scarta_i_corsi_di_sicurezza(self):
+        ev = scrape.parse_racing4fun("speer", "https://www.racing4fun.de/veranstalter/speer-racing-gmbh/")(SPEER, TODAY)
+        self.assertEqual(len(ev), 11)
+        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["circuit"]), ("2027-01-03", "2027-01-05", "valencia"))
+        self.assertNotIn("92341", [e["uid"] for e in ev])
+        self.assertEqual(ev[-1]["circuit"], "brno")
+        self.assertEqual({e["circuit"] for e in ev}, {"valencia", "anneau-du-rhin", "hockenheim", "assen", "brno"})
+        camp = [e for e in ev if e["uid"] in ("92357", "92359")]
+        self.assertEqual([e["note"] for e in camp], ["2 Tage RookieCamp", "2 Tage GirlsCamp"])
+        self.assertEqual(ev[1]["note"], "")
+
+    def test_rehm_ufficiale(self):
+        ev = scrape.parse_official("rehm", "https://www.rehmracedays.com/it/rehm-race-calendario/")(REHM_OFF, TODAY)
+        self.assertEqual(len(ev), 19)
+        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["circuit"]), ("2026-09-04", "2026-09-06", "tazio-nuvolari"))
+        self.assertEqual([e["circuit"] for e in ev][1:4], ["rijeka", "most", "ledenon"])
+        self.assertEqual((ev[7]["price"], ev[10]["price"]), ("da 640 €", "da 540 €"))
+        self.assertEqual(ev[3]["price"], "")
+
+    def test_speer_ufficiale_scarta_coaching_e_corsi(self):
+        ev = scrape.parse_official("speer", "https://www.speer-racing.de/en/",
+                                   ("instruktor", "instructor", "coaching", "schraglagen", "slt "))(SPEER_OFF, TODAY)
+        self.assertEqual(len(ev), 11)
+        self.assertEqual((ev[0]["start"], ev[0]["end"], ev[0]["price"]), ("2027-01-03", "2027-01-05", "da 1.485 €"))
+        self.assertEqual([e["circuit"] for e in ev][-3:], ["mugello", "assen", "brno"])
+        self.assertEqual((ev[-1]["start"], ev[-1]["end"]), ("2027-07-30", "2027-08-01"))
+
     def test_anno_dedotto(self):
         self.assertEqual(scrape.infer_year(2, 5, dt.date(2026, 11, 20)), 2027)
         self.assertEqual(scrape.infer_year(11, 25, dt.date(2026, 11, 20)), 2026)
@@ -131,7 +249,7 @@ class Parsers(unittest.TestCase):
 class Raccolta(unittest.TestCase):
     def test_tutto_ok(self):
         r = scrape.collect(TODAY, fake(full()))
-        self.assertEqual(len(r["events"]), 13)
+        self.assertEqual(len(r["events"]), 36)
         self.assertEqual([e["start"] for e in r["events"]], sorted(e["start"] for e in r["events"]))
         st = {s["id"]: s for s in r["sources"]}
         self.assertEqual(st["rf"]["status"], "ok")
@@ -141,24 +259,37 @@ class Raccolta(unittest.TestCase):
     def test_sito_non_raggiungibile_conserva_le_date(self):
         prima = scrape.collect(TODAY, fake(full()))
         dopo = scrape.collect(TODAY, fake(full(racingfactory=OSError("timeout"))), previous=prima)
-        self.assertEqual(len(dopo["events"]), 13)
+        self.assertEqual(len(dopo["events"]), 36)
         self.assertEqual({s["id"]: s for s in dopo["sources"]}["rf"]["status"], "errore")
 
     def test_struttura_cambiata_conserva_le_date(self):
         prima = scrape.collect(TODAY, fake(full()))
         dopo = scrape.collect(TODAY, fake(full(gullyracing="<html><body>Nuovo sito</body></html>")), previous=prima)
-        self.assertEqual(len(dopo["events"]), 13)
+        self.assertEqual(len(dopo["events"]), 36)
         self.assertEqual({s["id"]: s for s in dopo["sources"]}["gully"]["status"], "da_controllare")
 
     def test_date_passate_scompaiono(self):
         r = scrape.collect(dt.date(2027, 3, 1), fake(full()))
         self.assertTrue(all(e["end"] >= "2027-03-01" for e in r["events"]))
-        self.assertLess(len(r["events"]), 13)
+        self.assertLess(len(r["events"]), 36)
+
+    def test_turni_sovrapposti_diventano_uno(self):
+        r = scrape.collect(TODAY, fake(full()))
+        sp = [e for e in r["events"] if e["org"] == "speer"]
+        starts = [(e["circuit"], e["start"], e["end"]) for e in sp]
+        self.assertEqual(len(starts), len(set(starts)))
+        val = [e for e in sp if e["circuit"] == "valencia"]
+        self.assertEqual(len(val), 1)
+        self.assertEqual((val[0]["start"], val[0]["end"], val[0]["price"], val[0]["src"]), ("2027-01-03", "2027-01-05", "da 535 €", "speer"))
+        cal = [e for e in sp if e["circuit"] == "calafat"]
+        self.assertEqual((len(cal), cal[0]["start"], cal[0]["end"]), (1, "2027-03-17", "2027-03-20"))
+        anneau = [e for e in sp if e["circuit"] == "anneau-du-rhin" and e["start"].startswith("2027-03")]
+        self.assertEqual((len(anneau), anneau[0]["start"], anneau[0]["end"]), (1, "2027-03-26", "2027-03-27"))
 
     def test_doppioni_mugello(self):
         pages = full(mugellocircuit=MUGELLO)
         r = scrape.collect(TODAY, fake(pages))
-        mug = [e for e in r["events"] if e["circuit"] == "mugello"]
+        mug = [e for e in r["events"] if e["circuit"] == "mugello" and e["org"] in ("promo", "altro")]
         self.assertEqual(len(mug), 2)
 
 
