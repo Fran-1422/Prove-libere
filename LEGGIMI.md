@@ -1,4 +1,4 @@
-# Calendario prove libere moto: come metterlo online
+# TrackDay Finder: come metterlo online
 
 Dieci minuti, una volta sola. Alla fine avrai un indirizzo web che puoi installare come app su iPhone, Android, Mac e Windows. Ogni giorno un programma legge i siti degli organizzatori e aggiorna le date da solo.
 

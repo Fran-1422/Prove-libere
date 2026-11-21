@@ -1,7 +1,7 @@
 {
-  "name": "Calendario Prove Libere Moto",
-  "short_name": "Prove Libere",
-  "description": "Date delle prove libere moto per circuito e organizzatore.",
+  "name": "TrackDay Finder",
+  "short_name": "TrackDay Finder",
+  "description": "Trova le prove libere moto per circuito e organizzatore.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",
