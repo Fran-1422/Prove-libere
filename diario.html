@@ -124,13 +124,12 @@ dialog form { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
     <h2 id="authTitle">Accedi al tuo diario</h2>
     <p class="muted" style="margin:0">Il diario è privato: lo vedi solo tu, da qualsiasi dispositivo.</p>
     <form id="authForm" novalidate>
-      <label class="f">Email<input id="email" type="email" autocomplete="email" required></label>
+      <label class="f">Username<input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="3" maxlength="30" required></label>
       <label class="f">Password<input id="pw" type="password" autocomplete="current-password" minlength="6" required></label>
       <div class="err" id="authErr" role="alert"></div>
       <button class="btn" id="authGo" type="submit">Accedi</button>
       <button class="ghost" id="authSwap" type="button">Non hai un account? Creane uno</button>
-      <button class="ghost" id="authGoogle" type="button">Continua con Google</button>
-      <button class="ghost small" id="authReset" type="button">Password dimenticata?</button>
+      <p class="muted" id="authNote" style="margin:0;font-size:0.82rem">Username: 3–30 caratteri tra lettere, numeri, punto, trattino e trattino basso. La password non si può recuperare: conservala in un posto sicuro.</p>
     </form>
   </section>
 
@@ -456,11 +455,19 @@ function showApp() {
   store = norm(readLocal(key()));
   renderView();
 }
+// Firebase accede con email e password: lo username diventa un indirizzo interno che non riceve posta.
+const UNAME_DOMAIN = "@users.trackdayfinder.invalid";
+function toLogin(raw) {
+  const v = String(raw || "").trim().toLowerCase();
+  if (v.includes("@")) return v;                 // account creati con una vera email
+  if (!/^[a-z0-9._-]{3,30}$/.test(v)) return null;
+  return v + UNAME_DOMAIN;
+}
+const shownName = (email) => String(email || "Account").replace(UNAME_DOMAIN, "");
 const AUTH_ERR = {
-  "auth/invalid-credential": "Email o password non corretti.", "auth/wrong-password": "Password non corretta.", "auth/user-not-found": "Nessun account con questa email.",
-  "auth/email-already-in-use": "Esiste già un account con questa email: accedi.", "auth/weak-password": "La password deve avere almeno 6 caratteri.",
-  "auth/invalid-email": "Email non valida.", "auth/too-many-requests": "Troppi tentativi: riprova tra qualche minuto.", "auth/popup-closed-by-user": "Accesso annullato.",
-  "auth/unauthorized-domain": "Dominio non autorizzato: aggiungilo in Firebase → Authentication → Impostazioni → Domini autorizzati.", "auth/network-request-failed": "Connessione assente.",
+  "auth/invalid-credential": "Username o password non corretti.", "auth/wrong-password": "Password non corretta.", "auth/user-not-found": "Nessun account con questo username.",
+  "auth/email-already-in-use": "Questo username è già preso: scegline un altro o accedi.", "auth/weak-password": "La password deve avere almeno 6 caratteri.",
+  "auth/invalid-email": "Username non valido.", "auth/too-many-requests": "Troppi tentativi: riprova tra qualche minuto.",   "auth/unauthorized-domain": "Dominio non autorizzato: aggiungilo in Firebase → Authentication → Impostazioni → Domini autorizzati.", "auth/network-request-failed": "Connessione assente.",
 };
 
 async function startCloud() {
@@ -488,19 +495,15 @@ async function startCloud() {
   $("authSwap").onclick = () => setMode(mode === "login" ? "signup" : "login");
   $("authForm").onsubmit = async (ev) => {
     ev.preventDefault(); $("authErr").textContent = "";
-    try { await (mode === "login" ? auth.signInWithEmailAndPassword : auth.createUserWithEmailAndPassword)(au, $("email").value.trim(), $("pw").value); } catch (e) { fail(e); }
-  };
-  $("authGoogle").onclick = async () => { try { await auth.signInWithPopup(au, new auth.GoogleAuthProvider()); } catch (e) { fail(e); } };
-  $("authReset").onclick = async () => {
-    const em = $("email").value.trim();
-    if (!em) { $("authErr").textContent = "Scrivi prima la tua email."; return; }
-    try { await auth.sendPasswordResetEmail(au, em); $("authErr").textContent = "Ti ho inviato un'email per reimpostare la password."; } catch (e) { fail(e); }
+    const login = toLogin($("email").value);
+    if (!login) { $("authErr").textContent = "Username non valido: 3–30 caratteri tra lettere, numeri, punto, trattino e trattino basso."; return; }
+    try { await (mode === "login" ? auth.signInWithEmailAndPassword : auth.createUserWithEmailAndPassword)(au, login, $("pw").value); } catch (e) { fail(e); }
   };
   $("logout").onclick = () => auth.signOut(au);
   auth.onAuthStateChanged(au, async (u) => {
     if (!u) { user = null; $("user").hidden = true; $("app").hidden = true; $("auth").hidden = false; store = norm(); return; }
     user = { uid: u.uid, email: u.email };
-    $("who").textContent = u.email || "Account"; $("user").hidden = false;
+    $("who").textContent = shownName(u.email); $("user").hidden = false;
     showApp(); setSync("Sincronizzo…");
     await pullCloud(); renderView();
   });
