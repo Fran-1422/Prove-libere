@@ -31,6 +31,7 @@
   }
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
   padding-top: max(24px, env(safe-area-inset-top, 0px)); padding-bottom: max(48px, env(safe-area-inset-bottom, 0px));
@@ -121,6 +122,16 @@ th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; colo
 a { color: var(--accent); }
 .install { font-size: 0.88rem; color: var(--muted); }
 .install button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; margin-right: 8px; }
+.tabs { align-self: flex-start; }
+.tabs button { padding: 8px 18px; font-weight: 600; }
+.pick { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; min-height: 36px; font-size: 0.86rem; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
+.pick[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.pick.rm { color: var(--bad); }
+.warn { color: var(--warn); font-weight: 500; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tools .tip { flex-basis: 100%; color: var(--muted); font-size: 0.85rem; }
+.row.sel { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.book .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 @media (max-width: 560px) {
   .row { grid-template-columns: 78px minmax(0, 1fr); }
   .book { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
@@ -152,13 +163,26 @@ a { color: var(--accent); }
     </div>
   </header>
 
+  <nav class="seg tabs" role="group" aria-label="Pagina">
+    <button id="tab-all" type="button" aria-pressed="true">Tutte le date</button>
+    <button id="tab-mio" type="button" aria-pressed="false">Il mio calendario</button>
+  </nav>
+
   <div id="banner"></div>
 
-  <section class="panel filters" aria-label="Filtri">
+  <section class="panel filters" id="filters" aria-label="Filtri">
     <div><div class="label" id="fn-l">Nazione</div><div class="dd" id="fn" data-key="countries"></div></div>
     <div><div class="label" id="fc-l">Circuito</div><div class="dd" id="fc" data-key="circuits"></div></div>
     <div><div class="label" id="fo-l">Organizzatore</div><div class="dd" id="fo" data-key="orgs"></div></div>
   </section>
+
+  <div class="tools" id="mioTools" hidden>
+    <button class="refresh" id="ics" type="button">Scarica nel calendario (.ics)</button>
+    <button class="refresh" id="copy" type="button">Copia elenco</button>
+    <button class="refresh" id="clear" type="button">Svuota</button>
+    <span class="status" id="toolSt" aria-live="polite"></span>
+    <div class="tip" id="tip"></div>
+  </div>
 
   <div class="bar">
     <div class="count" id="count" aria-live="polite"></div>
@@ -170,7 +194,7 @@ a { color: var(--accent); }
 
   <main id="out"></main>
 
-  <section class="panel" aria-label="Fonti">
+  <section class="panel" id="srcpanel" aria-label="Fonti">
     <h2>Fonti controllate</h2>
     <div class="tw"><table id="src"></table></div>
   </section>
@@ -186,7 +210,7 @@ const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "rehm", "speer",
 const STATO = { ok: "ok", vuoto: "nessuna data", da_controllare: "da controllare", errore: "errore" };
 
 let DATA = { events: [], circuits: [], orgs: {}, sources: [] };
-const state = { countries: new Set(), circuits: new Set(), orgs: new Set(), view: "list", ym: null, open: null };
+const state = { countries: new Set(), circuits: new Set(), orgs: new Set(), view: "list", ym: null, open: null, page: "all" };
 const NAZIONI = { IT: "Italia", ES: "Spagna", FR: "Francia", DE: "Germania", PT: "Portogallo", HR: "Croazia", CZ: "Rep. Ceca", NL: "Paesi Bassi", AT: "Austria", SI: "Slovenia", HU: "Ungheria", BE: "Belgio", GB: "Regno Unito", CH: "Svizzera", PL: "Polonia", SK: "Slovacchia" };
 const flag = (cc) => /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint(...[...cc].map((ch) => 0x1F1A5 + ch.charCodeAt(0))) : "";
 const nationName = (cc) => NAZIONI[cc] || cc;
@@ -199,6 +223,26 @@ const orgColor = (o) => "var(--o-" + (KNOWN_ORGS.includes(o) ? o : "altro") + ")
 const orgName = (o) => DATA.orgs[o] || o;
 const circ = (id) => DATA.circuits.find((c) => c.id === id) || { id, name: id, country: "" };
 const evCountry = (e) => e.country || circ(e.circuit).country || "";
+
+// Le date scelte restano su questo dispositivo (localStorage). Si salva anche una copia
+// dell'evento, per non perderlo se il sito dell'organizzatore lo toglie.
+const MIO_KEY = "tdf.mio.v1";
+let mio = {};
+try { mio = JSON.parse(localStorage.getItem(MIO_KEY)) || {}; } catch (e) { mio = {}; }
+const saveMio = () => { try { localStorage.setItem(MIO_KEY, JSON.stringify(mio)); } catch (e) {} };
+function mioList() {
+  const oggi = iso(new Date());
+  return Object.values(mio).map((snap) => {
+    const live = DATA.events.find((e) => e.id === snap.id);
+    return live || Object.assign({}, snap, DATA.loaded ? { gone: true } : {});
+  }).filter((e) => e.end >= oggi).sort((a, b) => a.start.localeCompare(b.start));
+}
+function toggleMio(id) {
+  const e = DATA.events.find((x) => x.id === id);
+  if (mio[id]) delete mio[id]; else if (e) mio[id] = e;
+  saveMio(); render();
+}
+const overlaps = (list, e) => list.filter((o) => o.id !== e.id && o.start <= e.end && e.start <= o.end);
 
 function filtered() {
   return DATA.events.filter((e) => (!state.countries.size || state.countries.has(evCountry(e))) && (!state.circuits.size || state.circuits.has(e.circuit)) && (!state.orgs.size || state.orgs.has(e.org)))
@@ -280,6 +324,7 @@ function dateBlock(e) {
 }
 
 function emptyMsg() {
+  if (state.page === "mio") return '<div class="empty">Non hai ancora scelto nessuna data. Vai su «Tutte le date» e tocca «Aggiungi» sulle date che ti interessano: qui comporrai il tuo calendario.</div>';
   const names = [...state.circuits].map((id) => circ(id).name);
   let m = "Nessuna data con questi filtri.";
   if (!names.length && state.countries.size) names.push(...[...state.countries].map(nationName));
@@ -289,6 +334,7 @@ function emptyMsg() {
 
 function renderList(list) {
   if (!list.length) return emptyMsg();
+  const isMio = state.page === "mio";
   const groups = new Map();
   list.forEach((e) => { const k = e.start.slice(0, 7); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
   let h = "";
@@ -297,11 +343,18 @@ function renderList(list) {
     h += '<section class="month"><h2>' + MESI[m - 1] + " " + y + "<span>" + items.length + (items.length === 1 ? " data" : " date") + "</span></h2>";
     items.forEach((e) => {
       const c = circ(e.circuit);
-      h += '<article class="row">' + dateBlock(e) +
+      const ov = isMio ? overlaps(list, e) : [];
+      const pick = isMio
+        ? '<button class="pick rm" type="button" data-toggle="' + esc(e.id) + '">Rimuovi</button>'
+        : '<button class="pick" type="button" data-toggle="' + esc(e.id) + '" aria-pressed="' + (mio[e.id] ? "true" : "false") + '">' + (mio[e.id] ? "★ Nel mio calendario" : "☆ Aggiungi") + "</button>";
+      h += '<article class="row' + (!isMio && mio[e.id] ? " sel" : "") + '">' + dateBlock(e) +
         '<div class="what"><strong>' + esc(c.name) + (c.country ? "<i>" + esc(c.country) + "</i>" : "") + "</strong>" +
         '<div class="meta"><span class="org"><span class="dot" style="--c:' + orgColor(e.org) + '"></span>' + esc(orgName(e.org)) + "</span>" +
-        (e.note ? "<span>" + esc(e.note) + "</span>" : "") + "</div></div>" +
-        '<div class="book"><span class="price">' + esc(e.price || "Prezzo sul sito") + '</span><a class="btn" href="' + esc(safeUrl(e.url)) + '" target="_blank" rel="noopener">Dettagli</a></div></article>';
+        (e.note ? "<span>" + esc(e.note) + "</span>" : "") +
+        (e.gone ? '<span class="warn">Non più sul sito dell\'organizzatore: controlla</span>' : "") +
+        (ov.length ? '<span class="warn">Si sovrappone a ' + ov.map((o) => esc(circ(o.circuit).name)).join(", ") + "</span>" : "") + "</div></div>" +
+        '<div class="book"><span class="price">' + esc(e.price || "Prezzo sul sito") + '</span><div class="acts">' + pick +
+        '<a class="btn" href="' + esc(safeUrl(e.url)) + '" target="_blank" rel="noopener">Dettagli</a></div></div></article>';
     });
     h += "</section>";
   });
@@ -356,9 +409,16 @@ function renderSources() {
 }
 
 function render() {
-  const list = filtered();
-  renderFilters();
-  $("count").textContent = list.length + (list.length === 1 ? " data" : " date") + " mostrate su " + DATA.events.length;
+  const isMio = state.page === "mio";
+  const list = isMio ? mioList() : filtered();
+  const nMio = Object.keys(mio).length;
+  $("tab-all").setAttribute("aria-pressed", String(!isMio));
+  $("tab-mio").setAttribute("aria-pressed", String(isMio));
+  $("tab-mio").textContent = "Il mio calendario" + (nMio ? " (" + nMio + ")" : "");
+  $("filters").hidden = isMio; $("srcpanel").hidden = isMio; $("mioTools").hidden = !isMio || !list.length;
+  if (isMio) renderTools(list); else renderFilters();
+  $("count").textContent = isMio ? list.length + (list.length === 1 ? " data scelta" : " date scelte")
+    : list.length + (list.length === 1 ? " data" : " date") + " mostrate su " + DATA.events.length;
   $("vl").setAttribute("aria-pressed", String(state.view === "list"));
   $("vm").setAttribute("aria-pressed", String(state.view === "month"));
   if (state.view === "list") { $("out").innerHTML = renderList(list); return; }
@@ -367,6 +427,60 @@ function render() {
   const p = $("pm"), n = $("nm");
   if (p) p.addEventListener("click", () => { jump(-1, list); state.keep = true; render(); state.keep = false; });
   if (n) n.addEventListener("click", () => { jump(1, list); state.keep = true; render(); state.keep = false; });
+}
+
+function renderTools(list) {
+  const nums = list.map((e) => (e.price || "").match(/(\d[\d.]*)/)).filter(Boolean).map((m) => parseInt(m[1].replace(/\./g, ""), 10));
+  $("tip").textContent = nums.length
+    ? "Prezzi di partenza dei turni scelti: circa " + nums.reduce((a, b) => a + b, 0).toLocaleString("it-IT") + " € in totale (" + nums.length + " su " + list.length + " con prezzo). Servizi e box esclusi. Il calendario è salvato su questo dispositivo."
+    : "Il calendario è salvato su questo dispositivo.";
+}
+
+const ymd = (s) => s.replace(/-/g, "");
+const icsEsc = (t) => String(t == null ? "" : t).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+const titleOf = (e) => "Prove libere " + circ(e.circuit).name + " (" + orgName(e.org) + ")";
+function buildIcs(list) {
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TrackDay Finder//IT", "CALSCALE:GREGORIAN", "X-WR-CALNAME:TrackDay Finder"];
+  list.forEach((e) => {
+    const c = circ(e.circuit), nx = new Date(parse(e.end).getTime() + 90000000); // fine esclusa: giorno dopo
+    lines.push("BEGIN:VEVENT", "UID:" + e.id + "@trackdayfinder", "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + ymd(e.start), "DTEND;VALUE=DATE:" + ymd(iso(nx)),
+      "SUMMARY:" + icsEsc(titleOf(e)), "LOCATION:" + icsEsc(c.name + (c.country ? ", " + c.country : "")),
+      "DESCRIPTION:" + icsEsc([e.price, e.note, e.url].filter(Boolean).join("\n")), e.url ? "URL:" + e.url : "", "END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  return lines.filter(Boolean).join("\r\n") + "\r\n";
+}
+function plainText(list) {
+  return list.map((e) => {
+    const d = e.start === e.end ? fmtChecked(e.start) : fmtChecked(e.start) + " – " + fmtChecked(e.end);
+    return d + " · " + circ(e.circuit).name + " · " + orgName(e.org) + (e.price ? " · " + e.price : "") + (e.url ? "\n" + e.url : "");
+  }).join("\n\n");
+}
+const say = (t) => { $("toolSt").textContent = t; setTimeout(() => { $("toolSt").textContent = ""; }, 4500); };
+async function exportIcs() {
+  const list = mioList();
+  if (!list.length) return;
+  const blob = new Blob([buildIcs(list)], { type: "text/calendar" });
+  try {
+    const file = new File([blob], "trackday-finder.ics", { type: "text/calendar" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "TrackDay Finder" }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "trackday-finder.ics";
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  say("File scaricato: aprilo per aggiungere le date al calendario.");
+}
+async function copyList() {
+  try { await navigator.clipboard.writeText(plainText(mioList())); say("Elenco copiato."); }
+  catch (e) { say("Copia non riuscita su questo dispositivo."); }
+}
+function route() {
+  state.page = location.hash === "#mio" ? "mio" : "all";
+  state.ym = null;
+  render();
 }
 
 function fmtChecked(s) {
@@ -383,9 +497,12 @@ async function load(manual) {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const before = DATA.checked, n0 = DATA.events.length;
     DATA = await res.json();
+    DATA.loaded = true;
     const oggi = iso(new Date());
     DATA.events = DATA.events.filter((e) => e.end >= oggi); // le date passate spariscono subito, anche tra un aggiornamento e l'altro
     $("sub").textContent = "Date di Racing Factory, Gully Racing, Promo Racing, Rosso Corsa, Rehm, Speer Racing e dei circuiti. Controllate il " + fmtChecked(DATA.checked) + ".";
+    Object.keys(mio).forEach((k) => { if (mio[k].end < oggi) delete mio[k]; });
+    saveMio();
     renderSources(); render();
     if (manual) st.textContent = before === DATA.checked && n0 === DATA.events.length ? "Già aggiornato" : "Aggiornato";
   } catch (err) {
@@ -397,10 +514,23 @@ async function load(manual) {
   }
 }
 
+$("tab-all").addEventListener("click", () => { location.hash = "tutte"; });
+$("tab-mio").addEventListener("click", () => { location.hash = "mio"; });
+window.addEventListener("hashchange", route);
+$("out").addEventListener("click", (ev) => { const b = ev.target.closest("[data-toggle]"); if (b) toggleMio(b.dataset.toggle); });
+$("ics").addEventListener("click", exportIcs);
+$("copy").addEventListener("click", copyList);
+$("clear").addEventListener("click", () => {
+  const b = $("clear");
+  if (b.dataset.sure) { mio = {}; saveMio(); delete b.dataset.sure; b.textContent = "Svuota"; render(); return; }
+  b.dataset.sure = "1"; b.textContent = "Tocca ancora per svuotare";
+  setTimeout(() => { delete b.dataset.sure; b.textContent = "Svuota"; }, 3500);
+});
 $("vl").addEventListener("click", () => { state.view = "list"; render(); });
 $("vm").addEventListener("click", () => { state.view = "month"; render(); });
 $("refresh").addEventListener("click", () => load(true));
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(false); });
+route();
 load(false);
 
 if ("serviceWorker" in navigator) {
