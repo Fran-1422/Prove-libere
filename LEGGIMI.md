@@ -45,6 +45,19 @@ Da quel momento il programma parte da solo ogni mattina. Se le date non cambiano
 
 Il pulsante **Aggiorna** nell'app scarica le ultime date salvate. Non legge direttamente i siti: lo fa il programma ogni mattina. Per una lettura subito, vai su GitHub → Actions → Aggiorna date → Run workflow, poi premi Aggiorna nell'app.
 
+## Diario giornate e account privato
+
+La pagina `diario.html` (scheda «Diario giornate») tiene il consuntivo: giornate acquistate e svolte, tempi per turno, giri, gomme (mescole e giornate fatte) e ricambi come pastiglie, catena, olio (giornate dal montaggio). Senza account funziona subito, ma i dati restano sul dispositivo. Per avere un account privato, uguale su iPhone, Mac e PC, collega Firebase (gratis, circa 10 minuti):
+
+1. Vai su console.firebase.google.com, accedi con un account Google e premi **Crea un progetto** (puoi disattivare Google Analytics).
+2. **Build → Authentication → Inizia**. In «Metodo di accesso» attiva **Email/password** e, se vuoi, **Google**.
+3. In **Authentication → Impostazioni → Domini autorizzati** aggiungi `fran-1422.github.io`.
+4. **Build → Firestore Database → Crea database**, modalità produzione, regione `eur3` (Europa). Poi scheda **Regole**, incolla il contenuto di `firestore.rules` e premi **Pubblica**.
+5. **Impostazioni progetto (ingranaggio) → Le tue app → icona web `</>`**: registra un'app e copia l'oggetto `firebaseConfig` (apiKey, authDomain, projectId, appId).
+6. Incolla quei valori in `firebase-config.js` al posto di `window.TDF_FIREBASE = null;` e salva su GitHub.
+
+Le chiavi di Firebase sono pubbliche per progetto: a proteggere i dati sono l'accesso con account e le regole del punto 4. L'accesso con email e password funziona anche nell'app installata su iPhone; quello con Google può non funzionare in alcune app installate.
+
 ## Se un sito cambia
 
 Ogni sito ha una struttura diversa e può cambiarla. In quel caso:

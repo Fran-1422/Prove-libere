@@ -124,6 +124,7 @@ a { color: var(--accent); }
 .install button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; margin-right: 8px; }
 .tabs { align-self: flex-start; }
 .tabs button { padding: 8px 18px; font-weight: 600; }
+.tabs a { padding: 8px 18px; font-weight: 600; text-decoration: none; color: var(--fg); background: var(--surface); display: inline-flex; align-items: center; min-height: 36px; }
 .pick { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; min-height: 36px; font-size: 0.86rem; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
 .pick[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .pick.rm { color: var(--bad); }
@@ -166,6 +167,7 @@ a { color: var(--accent); }
   <nav class="seg tabs" role="group" aria-label="Pagina">
     <button id="tab-all" type="button" aria-pressed="true">Tutte le date</button>
     <button id="tab-mio" type="button" aria-pressed="false">Il mio calendario</button>
+    <a href="diario.html" id="tab-diario">Diario giornate</a>
   </nav>
 
   <div id="banner"></div>
