@@ -10,4 +10,9 @@
 //   projectId: "nome-progetto",
 //   appId: "1:123456789:web:abcdef"
 // };
-window.TDF_FIREBASE = null;
+window.TDF_FIREBASE = {
+  apiKey: "AIzaSyBMYNR4WugCOOM-_-f2FZzSy0f877WGRk8",
+  authDomain: "trackday-finder-733c9.firebaseapp.com",
+  projectId: "trackday-finder-733c9",
+  appId: "1:916773921310:web:5175ed33a1a5163afdc40f"
+};
