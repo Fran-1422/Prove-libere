@@ -1,7 +1,7 @@
 // Service worker: l'app funziona anche senza rete. Pagina e date si cercano sempre prima
 // in rete (cosi' gli aggiornamenti arrivano subito) e, se manca la connessione, si usa
 // l'ultima copia salvata.
-const CACHE = "prove-libere-v8";
+const CACHE = "prove-libere-v9";
 const SHELL = ["./", "index.html", "diario.html", "firebase-config.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
