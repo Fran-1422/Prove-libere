@@ -46,8 +46,8 @@ button { cursor: pointer; }
 .seg a[aria-current="page"] { background: var(--fg); color: var(--bg); }
 .seg a { padding: 8px 18px; }
 @media (max-width: 560px) {
-  .tabs { align-self: stretch; display: flex; flex-wrap: nowrap; }
-  .tabs > button, .tabs > a { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; padding: 8px 6px; font-size: 0.88rem; line-height: 1.2; }
+  .tabs, #tabs { align-self: stretch; display: flex; flex-wrap: nowrap; }
+  .tabs > button, .tabs > a, #tabs > button { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; padding: 8px 6px; font-size: 0.88rem; line-height: 1.2; }
 }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -294,7 +294,7 @@ function dayRow(d) {
 function viewDays() {
   const list = [...store.days].sort((a, b) => b.date.localeCompare(a.date));
   const mio = Object.values(readLocal("tdf.mio.v1") || {}).filter((e) => e.end >= today()).length;
-  return '<div class="head"><h2>Giornate</h2><div class="acts">' + (mio ? '<button class="ghost" data-a="import">Importa dal mio calendario (' + mio + ")</button>" : "") +
+  return '<div class="head"><h2>Giornate</h2><div class="acts">' + (mio ? '<button class="ghost" data-a="import">Importa dal mio calendario</button>' : "") +
     '<button class="btn" data-a="new-day">＋ Nuova giornata</button></div></div>' +
     (list.length ? '<div class="list" style="margin-top:12px">' + list.map(dayRow).join("") + "</div>" : '<div class="empty" style="margin-top:12px">Nessuna giornata. Aggiungine una, oppure importa quelle che hai scelto nel calendario.</div>');
 }

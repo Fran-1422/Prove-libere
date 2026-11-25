@@ -487,7 +487,7 @@ function render() {
   const nMio = Object.keys(mio).length;
   $("tab-all").setAttribute("aria-pressed", String(!isMio));
   $("tab-mio").setAttribute("aria-pressed", String(isMio));
-  $("tab-mio").textContent = "Il mio calendario" + (nMio ? " (" + nMio + ")" : "");
+  $("tab-mio").setAttribute("title", nMio ? nMio + (nMio === 1 ? " data scelta" : " date scelte") : "");
   $("filters").hidden = isMio; $("srcpanel").hidden = isMio; $("mioTools").hidden = !isMio || !list.length;
   if (isMio) renderTools(list); else renderFilters();
   $("count").textContent = isMio ? list.length + (list.length === 1 ? " data scelta" : " date scelte")
