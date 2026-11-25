@@ -43,6 +43,12 @@ button { cursor: pointer; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; align-self: flex-start; }
 .seg button, .seg a { border: 0; background: var(--surface); padding: 8px 16px; min-height: 38px; font-weight: 600; text-decoration: none; color: inherit; display: inline-flex; align-items: center; }
 .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg a[aria-current="page"] { background: var(--fg); color: var(--bg); }
+.seg a { padding: 8px 18px; }
+@media (max-width: 560px) {
+  .tabs { align-self: stretch; display: flex; flex-wrap: nowrap; }
+  .tabs > button, .tabs > a { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; padding: 8px 6px; font-size: 0.88rem; line-height: 1.2; }
+}
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -113,9 +119,10 @@ dialog form { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
     </div>
   </header>
 
-  <nav class="seg" aria-label="Pagina">
-    <a href="index.html">← Calendario</a>
+  <nav class="seg tabs" aria-label="Pagina">
+    <a href="index.html#tutte">Tutte le date</a>
     <a href="index.html#mio">Il mio calendario</a>
+    <a href="diario.html" aria-current="page">Diario giornate</a>
   </nav>
 
   <div id="banner"></div>

@@ -139,6 +139,10 @@ a { color: var(--accent); }
 .tabs { align-self: flex-start; }
 .tabs button { padding: 8px 18px; font-weight: 600; }
 .tabs a { padding: 8px 18px; font-weight: 600; text-decoration: none; color: var(--fg); background: var(--surface); display: inline-flex; align-items: center; min-height: 36px; }
+@media (max-width: 560px) {
+  .tabs { align-self: stretch; display: flex; flex-wrap: nowrap; }
+  .tabs > button, .tabs > a { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; padding: 8px 6px; font-size: 0.88rem; line-height: 1.2; }
+}
 .pick { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; min-height: 36px; font-size: 0.86rem; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
 .pick[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .pick.rm { color: var(--bad); }
