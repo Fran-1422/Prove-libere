@@ -97,6 +97,7 @@ dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--s
 dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
 dialog form { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sub { display: grid; gap: 10px; }
 .sess { display: grid; grid-template-columns: minmax(0, 1fr) 120px auto; gap: 8px; align-items: end; }
 .foot { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 @media (max-width: 560px) {
@@ -185,14 +186,31 @@ const dayBest = (d) => { const v = (d.sessions || []).map((s) => parseLap(s.best
 
 // ---- dati ----------------------------------------------------------------
 const CFG = window.TDF_FIREBASE && window.TDF_FIREBASE.apiKey ? window.TDF_FIREBASE : null;
-let store = { v: 1, days: [], tyres: [], parts: [], updatedAt: 0 };
+let store = { v: 2, days: [], tyres: [], parts: [], updatedAt: 0 };
 let user = null;           // { uid, email } con account; null in modalità senza account
 let catalog = { circuits: [], orgs: {} };
 const ui = { tab: "home" };
 const key = () => "tdf.diario." + (user ? user.uid : "guest");
 
 function readLocal(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
-function norm(o) { return Object.assign({ v: 1, days: [], tyres: [], parts: [], updatedAt: 0 }, o || {}); }
+const POS = { front: "Anteriore", rear: "Posteriore" };
+const COMP = { front: ["SC1", "SC2", "SC3"], rear: ["SCQ", "SCX", "SC0", "SC1", "SC2", "SC3"] };
+function migrate(o) {
+  if ((o.v || 1) >= 2) return o;
+  const map = {}, out = [];
+  (o.tyres || []).forEach((t) => {
+    if (t.pos) { out.push(t); return; }
+    map[t.id] = {};
+    [["front", t.front], ["rear", t.rear]].forEach(([pos, c]) => {
+      if (!c && (t.front || t.rear)) return;
+      const n = { id: t.id + "-" + pos[0], pos, compound: c || "", brand: t.brand || "", model: t.model || "", mountedAt: t.mountedAt || "", startDays: 0, startLaps: 0, maxDays: t.maxDays || "", retired: !!t.retired, removedAt: "", note: t.note || t.name || "" };
+      out.push(n); map[t.id][pos] = n.id;
+    });
+  });
+  (o.days || []).forEach((d) => { if (d.tyreId && map[d.tyreId]) { d.frontId = d.frontId || map[d.tyreId].front || ""; d.rearId = d.rearId || map[d.tyreId].rear || ""; } delete d.tyreId; });
+  o.tyres = out; o.v = 2; return o;
+}
+function norm(o) { return migrate(Object.assign({ v: 2, days: [], tyres: [], parts: [], updatedAt: 0 }, o || {})); }
 
 let cloud = null, pushTimer = null;
 function setSync(t) { $("sync").textContent = t; }
@@ -230,9 +248,10 @@ async function pullCloud() {
 // ---- statistiche ---------------------------------------------------------
 const done = () => store.days.filter((d) => d.status === "svolta");
 function tyreStats(t) {
-  const ds = done().filter((d) => d.tyreId === t.id);
+  const k = t.pos === "rear" ? "rearId" : "frontId";
+  const ds = done().filter((d) => d[k] === t.id);
   const bests = ds.map(dayBest).filter((x) => x != null);
-  return { days: ds.length, laps: ds.reduce((a, d) => a + (+d.laps || 0), 0), best: bests.length ? Math.min(...bests) : null };
+  return { days: (+t.startDays || 0) + ds.length, laps: (+t.startLaps || 0) + ds.reduce((a, d) => a + (+d.laps || 0), 0), best: bests.length ? Math.min(...bests) : null };
 }
 function partStats(p) {
   const ds = done().filter((d) => d.date >= (p.mountedAt || "0000") && (!p.removedAt || d.date <= p.removedAt));
@@ -252,7 +271,9 @@ function dateBlock(s) {
 }
 const circName = (id) => (catalog.circuits.find((c) => c.id === id) || {}).name || id || "Circuito";
 const orgName = (id) => catalog.orgs[id] || id || "";
-const tyreName = (id) => { const t = store.tyres.find((x) => x.id === id); return t ? t.name : ""; };
+const tyreLabel = (t) => t ? (t.compound || "?") + (t.brand || t.model ? " " + [t.brand, t.model].filter(Boolean).join(" ") : "") : "";
+const tyreById = (id) => store.tyres.find((x) => x.id === id);
+const mounted = (pos) => store.tyres.filter((t) => t.pos === pos && !t.retired).sort((a, b) => (b.mountedAt || "").localeCompare(a.mountedAt || ""))[0];
 
 function viewHome() {
   const dn = done(), todo = store.days.filter((d) => d.status !== "svolta");
@@ -269,9 +290,9 @@ function viewHome() {
     ? '<div class="tw"><table><thead><tr><th>Circuito</th><th>Miglior tempo</th><th>Quando</th><th>Giornate</th></tr></thead><tbody>' +
       [...by].sort((a, b) => circName(a[0]).localeCompare(circName(b[0]), "it")).map(([c, r]) => "<tr><td>" + esc(circName(c)) + '</td><td class="lap">' + fmtLap(r.best) + "</td><td>" + esc(r.date ? fmtDate(r.date) : "–") + "</td><td>" + r.n + "</td></tr>").join("") + "</tbody></table></div>"
     : '<div class="empty">Ancora nessuna giornata svolta. Aggiungila nella scheda Giornate.</div>') + "</section>";
-  const tyres = store.tyres.filter((t) => !t.retired), parts = store.parts.filter((p) => !p.removedAt);
+  const tyres = ["front", "rear"].map(mounted).filter(Boolean), parts = store.parts.filter((p) => !p.removedAt);
   h += '<section class="panel"><h2>Montato adesso</h2>' + (tyres.length || parts.length ? '<div class="list">' +
-    tyres.map((t) => { const s = tyreStats(t); return '<div class="item"><div class="top2"><h3>' + esc(t.name) + '</h3><span class="tag">gomme</span></div><div class="kv"><span>Giornate <b>' + s.days + "</b></span><span>Giri <b>" + s.laps + "</b></span>" + (s.best ? "<span>Miglior tempo <b>" + fmtLap(s.best) + "</b></span>" : "") + "</div>" + usage(s.days, +t.maxDays) + "</div>"; }).join("") +
+    tyres.map((t) => { const s = tyreStats(t); return '<div class="item"><div class="top2"><h3>' + esc(POS[t.pos] + " " + tyreLabel(t)) + '</h3><span class="tag">gomma</span></div><div class="kv"><span>Giornate <b>' + s.days + "</b></span><span>Giri <b>" + s.laps + "</b></span>" + (s.best ? "<span>Miglior tempo <b>" + fmtLap(s.best) + "</b></span>" : "") + "</div>" + usage(s.days, +t.maxDays) + "</div>"; }).join("") +
     parts.map((p) => { const s = partStats(p); return '<div class="item"><div class="top2"><h3>' + esc(p.name) + '</h3><span class="tag">ricambio</span></div><div class="kv"><span>Montato il <b>' + esc(fmtDate(p.mountedAt)) + "</b></span><span>Giornate <b>" + s.days + "</b></span><span>Giri <b>" + s.laps + "</b></span></div>" + usage(s.days, +p.maxDays) + "</div>"; }).join("") + "</div>"
     : '<div class="empty">Nessuna gomma o ricambio in uso. Aggiungili nelle schede Gomme e Ricambi per contare le giornate.</div>') + "</section>";
   const next = todo.filter((d) => d.date >= today()).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
@@ -280,7 +301,7 @@ function viewHome() {
 }
 
 function dayRow(d) {
-  const b = dayBest(d), t = tyreName(d.tyreId);
+  const b = dayBest(d), fa = tyreById(d.frontId), rp = tyreById(d.rearId), t = [fa && "Ant " + tyreLabel(fa), rp && "Post " + tyreLabel(rp)].filter(Boolean).join(" · ");
   const late = d.status !== "svolta" && d.date <= today();
   return '<article class="row">' + dateBlock(d.date) + '<div class="what"><strong>' + esc(circName(d.circuit)) + '</strong><div class="meta">' +
     '<span class="tag ' + (d.status === "svolta" ? "done" : "todo") + '">' + (d.status === "svolta" ? "svolta" : "acquistata") + "</span>" +
@@ -299,15 +320,19 @@ function viewDays() {
     (list.length ? '<div class="list" style="margin-top:12px">' + list.map(dayRow).join("") + "</div>" : '<div class="empty" style="margin-top:12px">Nessuna giornata. Aggiungine una, oppure importa quelle che hai scelto nel calendario.</div>');
 }
 
+function tyreCard(t) {
+  const s = tyreStats(t);
+  return '<div class="item"><div class="top2"><div><h3>' + esc(tyreLabel(t)) + '</h3><div class="muted" style="font-size:0.85rem">' + esc(t.mountedAt ? "Montata il " + fmtDate(t.mountedAt) + (+t.startDays ? " · già " + t.startDays + " giornate" : " · nuova") : "") + "</div></div>" +
+    '<span class="tag ' + (t.retired ? "off" : "done") + '">' + (t.retired ? "smontata" : "in uso") + "</span></div>" +
+    '<div class="kv"><span>Giornate <b>' + s.days + "</b></span><span>Giri <b>" + s.laps + "</b></span>" + (s.best ? "<span>Miglior tempo <b>" + fmtLap(s.best) + "</b></span>" : "") + "</div>" + usage(s.days, +t.maxDays) +
+    (t.note ? '<div class="muted" style="font-size:0.85rem">' + esc(t.note) + "</div>" : "") + '<div class="act" style="justify-content:flex-start"><button class="ghost small" data-a="edit-tyre" data-id="' + esc(t.id) + '">Modifica</button></div></div>';
+}
 function viewTyres() {
-  const list = [...store.tyres].sort((a, b) => (a.retired - b.retired) || (b.mountedAt || "").localeCompare(a.mountedAt || ""));
-  return '<div class="head"><h2>Gomme</h2><button class="btn" data-a="new-tyre">＋ Nuovo set</button></div><div class="list" style="margin-top:12px">' +
-    (list.length ? list.map((t) => { const s = tyreStats(t); return '<div class="item"><div class="top2"><div><h3>' + esc(t.name) + '</h3><div class="muted" style="font-size:0.85rem">' + esc([t.brand, t.model].filter(Boolean).join(" ")) + "</div></div>" +
-      '<span class="tag ' + (t.retired ? "off" : "done") + '">' + (t.retired ? "dismesse" : "in uso") + "</span></div>" +
-      '<div class="kv">' + (t.front ? "<span>Anteriore <b>" + esc(t.front) + "</b></span>" : "") + (t.rear ? "<span>Posteriore <b>" + esc(t.rear) + "</b></span>" : "") + (t.mountedAt ? "<span>Montate il <b>" + esc(fmtDate(t.mountedAt)) + "</b></span>" : "") + "</div>" +
-      '<div class="kv"><span>Giornate <b>' + s.days + "</b></span><span>Giri <b>" + s.laps + "</b></span>" + (s.best ? "<span>Miglior tempo <b>" + fmtLap(s.best) + "</b></span>" : "") + "</div>" + usage(s.days, +t.maxDays) +
-      (t.note ? '<div class="muted" style="font-size:0.85rem">' + esc(t.note) + "</div>" : "") + '<div class="act" style="justify-content:flex-start"><button class="ghost small" data-a="edit-tyre" data-id="' + esc(t.id) + '">Modifica</button></div></div>'; }).join("")
-    : '<div class="empty">Nessun set di gomme. Aggiungi il set che hai sulla moto: poi collegalo alle giornate per contarle.</div>') + "</div>";
+  return ["front", "rear"].map((pos) => {
+    const list = store.tyres.filter((t) => t.pos === pos).sort((a, b) => (a.retired - b.retired) || (b.mountedAt || "").localeCompare(a.mountedAt || ""));
+    return '<div class="head" style="margin-top:6px"><h2>' + POS[pos] + '</h2><button class="btn" data-a="new-tyre" data-pos="' + pos + '">＋ Monta ' + (pos === "front" ? "anteriore" : "posteriore") + "</button></div>" +
+      '<div class="list" style="margin:12px 0 22px">' + (list.length ? list.map(tyreCard).join("") : '<div class="empty">Nessuna gomma ' + POS[pos].toLowerCase() + ". Aggiungila qui, oppure registrala quando salvi una giornata.</div>") + "</div>";
+  }).join("");
 }
 
 function viewParts() {
@@ -355,9 +380,19 @@ function wireDelete(msg, fn) {
   });
 }
 
+function tyreSec(pos, d) {
+  const cur = d[pos + "Id"] || "";
+  const list = store.tyres.filter((t) => t.pos === pos).sort((a, b) => (a.retired - b.retired) || (b.mountedAt || "").localeCompare(a.mountedAt || ""));
+  const o = [["", "Non registrare"]].concat(list.map((t) => { const s = tyreStats(t); return [t.id, "Stessa: " + tyreLabel(t) + " · " + s.days + " giornate" + (t.retired ? " (smontata)" : "")]; }), [["__new", "Ho montato una gomma nuova / diversa…"]]);
+  const sub = "<div id=\"new-" + pos + "\" hidden class=\"sub\"><div class=\"two\"><label class=\"f\">Mescola<select name=\"" + pos + "Cmp\">" + opts(COMP[pos].map((c) => [c, c]), "", "Scegli…") + "</select></label>" +
+    "<label class=\"f\">Condizione<select name=\"" + pos + "Cond\" data-tcond=\"" + pos + "\">" + opts([["new", "Nuova"], ["used", "Già usata"]], "new") + "</select></label></div>" +
+    "<div id=\"used-" + pos + "\" hidden class=\"two\">" + field("Giornate già fatte", pos + "Days", "", 'type="number" min="0" inputmode="numeric"') + field("Giri già fatti", pos + "Laps", "", 'type="number" min="0" inputmode="numeric"') + "</div>" +
+    field("Marca (opzionale)", pos + "Brand", "", 'placeholder="Pirelli"') + "</div>";
+  return '<label class="f">Gomma ' + POS[pos].toLowerCase() + '<select name="' + pos + 'Sel" data-tsel="' + pos + '">' + opts(o.map((x) => [x[0], x[1]]), cur, "") + "</select></label>" + sub;
+}
 function dayForm(d) {
   const isNew = !d;
-  d = d || { date: today(), circuit: "", org: "", price: "", status: "svolta", tyreId: (store.tyres.find((t) => !t.retired) || {}).id || "", laps: "", notes: "", sessions: [] };
+  d = d || { date: today(), circuit: "", org: "", price: "", status: "svolta", frontId: (mounted("front") || {}).id || "", rearId: (mounted("rear") || {}).id || "", laps: "", notes: "", sessions: [] };
   const circs = catalog.circuits.map((c) => [c.id, c.name]).sort((a, b) => a[1].localeCompare(b[1], "it"));
   if (d.circuit && !circs.some((c) => c[0] === d.circuit)) circs.push([d.circuit, d.circuit]);
   const orgs = Object.entries(catalog.orgs).sort((a, b) => a[1].localeCompare(b[1], "it"));
@@ -368,40 +403,57 @@ function dayForm(d) {
     '<div class="two"><label class="f">Circuito<select name="circuit" required>' + opts(circs, d.circuit, "Scegli…") + "</select></label>" +
     '<label class="f">Organizzatore<select name="org">' + opts(orgs, d.org, "—") + "</select></label></div>" +
     '<div class="two">' + field("Prezzo pagato (€)", "price", d.price, 'type="number" min="0" step="1" inputmode="decimal"') + field("Giri totali", "laps", d.laps, 'type="number" min="0" step="1" inputmode="numeric"') + "</div>" +
-    '<label class="f">Gomme montate<select name="tyreId">' + opts(store.tyres.map((t) => [t.id, t.name + (t.retired ? " (dismesse)" : "")]), d.tyreId, "Nessuna") + "</select></label>" +
+    '<div id="tyresec"' + (d.status === "svolta" ? "" : " hidden") + ">" + tyreSec("front", d) + tyreSec("rear", d) + "</div>" +
     '<div><div class="muted" style="font-size:0.82rem;font-weight:600;margin-bottom:6px">Turni e tempi</div>' + (d.sessions || []).map(sessRow).join("") +
     '<button type="button" class="ghost small" data-addsess style="margin-top:8px">＋ Aggiungi turno</button></div>' +
     '<label class="f">Note<textarea name="notes" rows="2">' + esc(d.notes) + "</textarea></label>" + foot(!isNew),
   (fd, sess) => {
-    const rec = { id: d.id || uid(), date: fd.date, circuit: fd.circuit, org: fd.org, price: fd.price === "" ? "" : +fd.price, laps: fd.laps === "" ? "" : +fd.laps, status: fd.status, tyreId: fd.tyreId, notes: fd.notes.trim(), sessions: sess };
+    const rec = { id: d.id || uid(), date: fd.date, circuit: fd.circuit, org: fd.org, price: fd.price === "" ? "" : +fd.price, laps: fd.laps === "" ? "" : +fd.laps, status: fd.status, frontId: fd.frontSel === "__new" ? "" : fd.frontSel || "", rearId: fd.rearSel === "__new" ? "" : fd.rearSel || "", notes: fd.notes.trim(), sessions: sess };
     if (!rec.date || !rec.circuit) { form.querySelector(".err").textContent = "Data e circuito sono obbligatori."; return false; }
+    if (rec.status !== "svolta") { rec.frontId = d.frontId || ""; rec.rearId = d.rearId || ""; }
+    else for (const pos of ["front", "rear"]) {
+      if (fd[pos + "Sel"] !== "__new") continue;
+      if (!fd[pos + "Cmp"]) { form.querySelector(".err").textContent = "Scegli la mescola della gomma " + POS[pos].toLowerCase() + "."; return false; }
+      const used = fd[pos + "Cond"] === "used";
+      const t = { id: uid(), pos, compound: fd[pos + "Cmp"], brand: (fd[pos + "Brand"] || "").trim(), model: "", mountedAt: rec.date, startDays: used ? +fd[pos + "Days"] || 0 : 0, startLaps: used ? +fd[pos + "Laps"] || 0 : 0, maxDays: "", retired: false, removedAt: "", note: "" };
+      store.tyres.forEach((x) => { if (x.pos === pos && !x.retired && (x.mountedAt || "") <= rec.date) { x.retired = true; x.removedAt = rec.date; } });
+      store.tyres.push(t);
+      rec[pos + "Id"] = t.id;
+    }
     store.days = isNew ? [...store.days, rec] : store.days.map((x) => x.id === d.id ? rec : x);
     save();
   });
+  const stSel = form.querySelector('[name=status]');
+  stSel.addEventListener("change", () => { form.querySelector("#tyresec").hidden = stSel.value !== "svolta"; });
+  form.querySelectorAll("[data-tsel]").forEach((sel) => sel.addEventListener("change", () => { form.querySelector("#new-" + sel.dataset.tsel).hidden = sel.value !== "__new"; }));
+  form.querySelectorAll("[data-tcond]").forEach((sel) => sel.addEventListener("change", () => { form.querySelector("#used-" + sel.dataset.tcond).hidden = sel.value !== "used"; }));
   wireDelete("", () => { store.days = store.days.filter((x) => x.id !== d.id); save(); });
 }
 
-const COMPOUNDS = ["SC0", "SC1", "SC2", "SC3", "SCX", "Soft", "Medium", "Hard", "Intermedia", "Rain"];
-function tyreForm(t) {
+function tyreForm(t, pos) {
   const isNew = !t;
-  t = t || { name: "", brand: "", model: "", front: "", rear: "", mountedAt: today(), maxDays: "", retired: false, note: "" };
-  openDlg("<h2>" + (isNew ? "Nuovo set di gomme" : "Modifica gomme") + "</h2>" +
-    field("Nome del set", "name", t.name, 'required placeholder="Pirelli SC1 nuove"') +
+  pos = t ? t.pos : pos;
+  t = t || { pos, compound: "", brand: "", model: "", mountedAt: today(), startDays: 0, startLaps: 0, maxDays: "", retired: false, note: "" };
+  const used = +t.startDays > 0 || +t.startLaps > 0;
+  openDlg("<h2>" + (isNew ? "Monta gomma " : "Modifica gomma ") + POS[pos].toLowerCase() + "</h2>" +
+    '<div class="two"><label class="f">Mescola<select name="compound" required>' + opts(COMP[pos].map((c) => [c, c]), t.compound, "Scegli…") + "</select></label>" +
+    '<label class="f">Condizione<select name="cond" id="cond">' + opts([["new", "Nuova"], ["used", "Già usata"]], used ? "used" : "new") + "</select></label></div>" +
+    '<div id="usedbox" class="two"' + (used ? "" : " hidden") + ">" + field("Giornate già fatte", "startDays", t.startDays, 'type="number" min="0" inputmode="numeric"') + field("Giri già fatti", "startLaps", t.startLaps, 'type="number" min="0" inputmode="numeric"') + "</div>" +
     '<div class="two">' + field("Marca", "brand", t.brand, 'placeholder="Pirelli"') + field("Modello", "model", t.model, 'placeholder="Diablo Superbike"') + "</div>" +
-    '<datalist id="cmp">' + COMPOUNDS.map((c) => '<option value="' + c + '">').join("") + "</datalist>" +
-    '<div class="two">' + field("Mescola anteriore", "front", t.front, 'list="cmp"') + field("Mescola posteriore", "rear", t.rear, 'list="cmp"') + "</div>" +
-    '<div class="two">' + field("Montate il", "mountedAt", t.mountedAt, 'type="date"') + field("Giornate previste (opzionale)", "maxDays", t.maxDays, 'type="number" min="1" inputmode="numeric"') + "</div>" +
-    '<label class="f">Stato<select name="retired">' + opts([["0", "In uso"], ["1", "Dismesse"]], t.retired ? "1" : "0") + "</select></label>" +
+    '<div class="two">' + field("Montata il", "mountedAt", t.mountedAt, 'type="date"') + field("Giornate previste (opzionale)", "maxDays", t.maxDays, 'type="number" min="1" inputmode="numeric"') + "</div>" +
+    '<label class="f">Stato<select name="retired">' + opts([["0", "In uso"], ["1", "Smontata"]], t.retired ? "1" : "0") + "</select></label>" +
     '<label class="f">Note<textarea name="note" rows="2">' + esc(t.note) + "</textarea></label>" + foot(!isNew),
   (fd) => {
-    const rec = { id: t.id || uid(), name: fd.name.trim(), brand: fd.brand.trim(), model: fd.model.trim(), front: fd.front.trim(), rear: fd.rear.trim(), mountedAt: fd.mountedAt, maxDays: fd.maxDays === "" ? "" : +fd.maxDays, retired: fd.retired === "1", note: fd.note.trim() };
-    if (!rec.name) { form.querySelector(".err").textContent = "Dai un nome al set."; return false; }
+    const u = fd.cond === "used";
+    const rec = Object.assign({}, t, { id: t.id || uid(), pos, compound: fd.compound, brand: fd.brand.trim(), model: fd.model.trim(), mountedAt: fd.mountedAt, startDays: u ? +fd.startDays || 0 : 0, startLaps: u ? +fd.startLaps || 0 : 0, maxDays: fd.maxDays === "" ? "" : +fd.maxDays, retired: fd.retired === "1", note: fd.note.trim() });
+    if (!rec.compound) { form.querySelector(".err").textContent = "Scegli la mescola."; return false; }
+    if (isNew && !rec.retired) store.tyres.forEach((x) => { if (x.pos === pos && !x.retired && (x.mountedAt || "") <= rec.mountedAt) { x.retired = true; x.removedAt = rec.mountedAt; } });
     store.tyres = isNew ? [...store.tyres, rec] : store.tyres.map((x) => x.id === t.id ? rec : x);
     save();
   });
-  wireDelete("", () => { store.tyres = store.tyres.filter((x) => x.id !== t.id); store.days.forEach((d) => { if (d.tyreId === t.id) d.tyreId = ""; }); save(); });
+  const c = form.querySelector("#cond"); c.addEventListener("change", () => { form.querySelector("#usedbox").hidden = c.value !== "used"; });
+  wireDelete("", () => { store.tyres = store.tyres.filter((x) => x.id !== t.id); store.days.forEach((d) => { if (d.frontId === t.id) d.frontId = ""; if (d.rearId === t.id) d.rearId = ""; }); save(); });
 }
-
 const PART_NAMES = ["Pastiglie anteriori", "Pastiglie posteriori", "Dischi anteriori", "Catena", "Kit trasmissione", "Olio motore", "Liquido freni", "Filtro aria"];
 function partForm(p) {
   const isNew = !p;
@@ -428,7 +480,7 @@ function importFromCalendar() {
     for (let d = parse(e.start), i = 0; iso(d) <= e.end && i < 14; d.setDate(d.getDate() + 1), i++) {
       const date = iso(d);
       if (store.days.some((x) => x.date === date && x.circuit === e.circuit && x.org === e.org)) continue;
-      store.days.push({ id: uid(), date, circuit: e.circuit, org: e.org, price: "", laps: "", status: "acquistata", tyreId: "", sessions: [], notes: e.price ? "Turno " + e.price : "" });
+      store.days.push({ id: uid(), date, circuit: e.circuit, org: e.org, price: "", laps: "", status: "acquistata", frontId: "", rearId: "", sessions: [], notes: e.price ? "Turno " + e.price : "" });
       n++;
     }
   });
@@ -442,7 +494,7 @@ $("view").addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-a]"); if (!b) return;
   const a = b.dataset.a, id = b.dataset.id;
   if (a === "new-day") dayForm(); else if (a === "edit-day") dayForm(store.days.find((x) => x.id === id));
-  else if (a === "new-tyre") tyreForm(); else if (a === "edit-tyre") tyreForm(store.tyres.find((x) => x.id === id));
+  else if (a === "new-tyre") tyreForm(null, b.dataset.pos); else if (a === "edit-tyre") tyreForm(store.tyres.find((x) => x.id === id));
   else if (a === "new-part") partForm(); else if (a === "edit-part") partForm(store.parts.find((x) => x.id === id));
   else if (a === "import") importFromCalendar();
   else if (a === "done") { const d = store.days.find((x) => x.id === id); if (d) dayForm(Object.assign({}, d, { status: "svolta" })); }
