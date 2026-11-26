@@ -11,7 +11,7 @@ jobs:
         run: |
           mkdir -p dbg
           UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-          curl -sL -A "$UA" https://www.pistard-racing.it/ -o dbg/p_home.html || true
+          curl -sL -A "$UA" https://www.pistard-racing.it/prove-libere-moto/ -o dbg/p_plm.html || true
           curl -sL -A "$UA" https://www.pistard-racing.it/vallelunga/ -o dbg/p_vall.html || true
           curl -sL -A "$UA" https://www.pistard-racing.it/vallelunga/prove-libere-open-pit-4-ore/77/ -o dbg/p_77.html || true
           curl -sL -A "$UA" https://motorsport.vallelunga.it/pl-moto-2/ -o dbg/v_pl.html || true
