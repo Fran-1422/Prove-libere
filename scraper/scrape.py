@@ -53,7 +53,7 @@ CIRCUITS = [
     ("most", "Most", "CZ", ["most"]),
     ("ledenon", "Ledenon", "FR", ["ledenon"]),
 ]
-ALWAYS_SHOW = ["mugello", "misano", "cremona"]
+ALWAYS_SHOW = ["mugello", "misano", "cremona", "vallelunga"]
 
 ORGS = {
     "rf": "Racing Factory",
@@ -63,6 +63,8 @@ ORGS = {
     "cremona": "Cremona Circuit",
     "rehm": "Rehm Race Days",
     "speer": "Speer Racing",
+    "vallelunga": "Autodromo di Vallelunga",
+    "pistard": "Pistard Racing",
     "altro": "Altro organizzatore",
 }
 
@@ -586,6 +588,76 @@ def parse_racing4fun(org, base):
     return parse
 
 
+def parse_vallelunga(html, today):
+    """Calendario prove libere moto del sito dell'autodromo: un link per giorno con data-date."""
+    base = "https://motorsport.vallelunga.it/pl-moto-2/"
+    days = []
+    for m in re.finditer(r'<a\b[^>]*\bdata-date="(\d{4})-(\d{2})-(\d{2})"[^>]*>([\s\S]*?)</a>', html):
+        d = safe_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        if not d:
+            continue
+        pm = re.search(r'class="partner[^"]*"[^>]*>([^<]+)<', m.group(4))
+        mm = re.search(r'class="meta"[^>]*>([^<]+)<', m.group(4))
+        days.append((d, clean(pm.group(1)) if pm else "", clean(mm.group(1)) if mm else ""))
+    days.sort()
+    price = ""
+    i = html.find('id="prezzi"')
+    if i >= 0:
+        nums = [int(x) for x in re.findall(r"(\d{2,3})\s*(?:€|&euro;|&#8364;)", re.sub(r"<[^>]+>", " ", html[i:i + 3000]))]
+        nums = [n for n in nums if n >= 100][:2]
+        if nums:
+            price = "da %d €" % min(nums)
+    out, cur = [], []
+    for item in days:
+        if cur and (item[0] - cur[-1][0]).days > 1:
+            out.append(cur)
+            cur = []
+        cur.append(item)
+    if cur:
+        out.append(cur)
+    res = []
+    for grp in out:
+        notes = []
+        for _, partner, meta in grp:
+            if partner and partner not in notes:
+                notes.append(partner)
+        res.append(event("vallelunga", grp[0][0], grp[-1][0], canon("vallelunga"), price, ", ".join(notes), base))
+    return res
+
+
+def parse_pistard(html, today):
+    """Elenco eventi di Pistard Racing: ogni evento ha un link /circuito/titolo/numero/ e una data in italiano."""
+    base = "https://www.pistard-racing.it/prove-libere-moto/"
+    p = page(html, base)
+    text = p.text()
+    out, prev = [], 0
+    for m in re.finditer(r"⟦(https?://[^⟧]*pistard-racing\.it/[a-z0-9-]+/[a-z0-9-]+/\d+/?)⟧", text):
+        href = m.group(1)
+        seg = text[prev:m.start()]
+        prev = m.end()
+        ds = list(re.finditer(r"(\d{1,2})(?:\s*[-–/e]\s*(\d{1,2}))*\s+([A-Za-zÀ-ù]{3,})\.?\s*(20\d\d)?", seg))
+        found = None
+        for d in reversed(ds):
+            mon = month_num(d.group(3))
+            if mon:
+                found = (d, mon)
+                break
+        if not found:
+            continue
+        d, mon = found
+        nums = [int(x) for x in re.findall(r"\d{1,2}", re.sub(r"\s+[A-Za-zÀ-ù].*$", "", d.group(0)))]
+        y = int(d.group(4)) if d.group(4) else infer_year(mon, nums[0], today)
+        a = safe_date(y, mon, nums[0])
+        b = safe_date(y, mon, nums[-1])
+        if not a or not b:
+            continue
+        circ = find_circuit(href.split("pistard-racing.it/")[1].split("/")[0].replace("-", " ")) or find_circuit(seg) or canon("vallelunga")
+        pm = re.search(r"(\d[\d\.]*(?:,\d+)?)\s*€", seg)
+        price = (pm.group(1) + " €") if pm else ""
+        out.append(event("pistard", a, b, circ, price, "", href))
+    return out
+
+
 SOURCES = [
     {"id": "rf", "name": "Racing Factory", "urls": ["https://www.racingfactory.it/"], "parse": parse_rf, "zero_ok": False},
     {"id": "gully", "name": "Gully Racing", "urls": ["https://www.gullyracing.it/calendario"], "parse": parse_gully, "zero_ok": False},
@@ -599,6 +671,10 @@ SOURCES = [
      "parse": parse_racing4fun("rehm", "https://www.racing4fun.de/veranstalter/rehm-race-days/"), "zero_ok": True},
     {"id": "speer4f", "name": "Speer Racing (via Racing4Fun)", "urls": ["https://www.racing4fun.de/veranstalter/speer-racing-gmbh/"],
      "parse": parse_racing4fun("speer", "https://www.racing4fun.de/veranstalter/speer-racing-gmbh/"), "zero_ok": True},
+    {"id": "pistard", "name": "Pistard Racing (sito ufficiale)", "urls": ["https://www.pistard-racing.it/prove-libere-moto/"],
+     "parse": parse_pistard, "zero_ok": True},
+    {"id": "vallelunga", "name": "Autodromo di Vallelunga (sito ufficiale)", "urls": ["https://motorsport.vallelunga.it/pl-moto-2/"],
+     "parse": parse_vallelunga, "zero_ok": True},
     {"id": "cremona", "name": "Cremona Circuit (sito ufficiale)", "urls": ["https://cremonacircuit.it/en/booking/"], "parse": parse_cremona, "zero_ok": True},
     {"id": "mugello", "name": "Mugello Circuit (sito ufficiale)",
      "urls": ["https://mugellocircuit.com/en/events/bike-free-practices",
@@ -608,7 +684,7 @@ SOURCES = [
 ]
 FALLBACK = {"rehm4f": "rehm", "speer4f": "speer"}
 # Gli eventi dei siti degli organizzatori hanno la precedenza su quelli del Mugello.
-PRIORITY = ["rf", "gully", "promo", "rosso", "rehm", "speer", "rehm4f", "speer4f", "cremona", "mugello"]
+PRIORITY = ["rf", "gully", "promo", "rosso", "rehm", "speer", "rehm4f", "speer4f", "pistard", "vallelunga", "cremona", "mugello"]
 
 
 # ---------------------------------------------------------------- raccolta

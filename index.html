@@ -18,7 +18,7 @@
   color-scheme: light dark;
   --bg: #edf0f3; --surface: #ffffff; --surface-2: #f5f7f9; --fg: #131d27; --muted: #556473; --line: #d3dae1;
   --accent: #0b6e8a; --accent-fg: #ffffff; --warn: #8a5a00; --bad: #a32035;
-  --o-rf: #0b6e8a; --o-gully: #6b4fc0; --o-promo: #b45309; --o-rosso: #b3263e; --o-cremona: #2f7d32; --o-rehm: #1d4ed8; --o-speer: #be185d; --o-altro: #556473;
+  --o-rf: #0b6e8a; --o-gully: #6b4fc0; --o-promo: #b45309; --o-rosso: #b3263e; --o-cremona: #2f7d32; --o-rehm: #1d4ed8; --o-speer: #be185d; --o-vallelunga: #c2410c; --o-pistard: #0d9488; --o-altro: #556473;
   --f-head: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -27,7 +27,7 @@
   :root {
     --bg: #0e151b; --surface: #16202a; --surface-2: #1c2834; --fg: #e8edf2; --muted: #9aa9b8; --line: #2b3a48;
     --accent: #4cc0e0; --accent-fg: #07222b; --warn: #f0c36a; --bad: #f07a8e;
-    --o-rf: #4cc0e0; --o-gully: #a994ee; --o-promo: #f0a24a; --o-rosso: #f07a8e; --o-cremona: #7fd283; --o-rehm: #7aa2ff; --o-speer: #f472b6; --o-altro: #9aa9b8;
+    --o-rf: #4cc0e0; --o-gully: #a994ee; --o-promo: #f0a24a; --o-rosso: #f07a8e; --o-cremona: #7fd283; --o-rehm: #7aa2ff; --o-speer: #f472b6; --o-vallelunga: #fb923c; --o-pistard: #2dd4bf; --o-altro: #9aa9b8;
   }
 }
 * { box-sizing: border-box; }
@@ -234,7 +234,7 @@ a { color: var(--accent); }
 "use strict";
 const MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 const GIORNI = ["dom","lun","mar","mer","gio","ven","sab"];
-const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "rehm", "speer", "altro"];
+const KNOWN_ORGS = ["rf", "gully", "promo", "rosso", "cremona", "rehm", "speer", "vallelunga", "pistard", "altro"];
 const STATO = { ok: "ok", vuoto: "nessuna data", da_controllare: "da controllare", errore: "errore" };
 
 let DATA = { events: [], circuits: [], orgs: {}, sources: [] };

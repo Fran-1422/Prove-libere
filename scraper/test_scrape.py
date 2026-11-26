@@ -178,7 +178,27 @@ def full(**over):
     return pages
 
 
+VALL = """<div id="calendario"><a class="plmoto-day is-disabled" href="#" data-date="2027-02-05"><span class="num">05</span><span class="meta">9 &#8211; 13</span><span class="partner">THE BIKE</span></a>
+<a class="plmoto-day" href="x.pdf" data-date="2027-02-06"><span class="meta">4 gruppi</span></a>
+<a class="plmoto-day" href="x.pdf" data-date="2027-03-20"><span class="meta">3 gruppi</span><span class="partner">DUCATI APPIA</span></a></div>
+<div id="prezzi" class="plmoto-section"><h2>Prezzi</h2><p>Feriale 180 &euro;</p><p>210 €</p></div>"""
+
+PIST = """<html><body><div class="ev"><h3>Sabato 13 Marzo 2027</h3><p>Vallelunga</p><p>190 €</p><a href="https://www.pistard-racing.it/vallelunga/prove-libere-open-pit-4-ore/90/">Prenota</a></div>
+<div class="ev"><h3>10-11-12 Maggio 2027</h3><a href="https://www.pistard-racing.it/vallelunga/prove-libere-moto/91/">Prenota</a></div></body></html>"""
+
+
 class Parsers(unittest.TestCase):
+    def test_vallelunga_raggruppa_giorni_consecutivi(self):
+        ev = scrape.parse_vallelunga(VALL, TODAY)
+        self.assertEqual([(e["start"], e["end"], e["circuit"]) for e in ev], [("2027-02-05", "2027-02-06", "vallelunga"), ("2027-03-20", "2027-03-20", "vallelunga")])
+        self.assertEqual(ev[0]["note"], "THE BIKE")
+        self.assertEqual(ev[0]["price"], "da 180 €")
+
+    def test_pistard(self):
+        ev = scrape.parse_pistard(PIST, TODAY)
+        self.assertEqual([(e["start"], e["end"], e["circuit"], e["org"]) for e in ev], [("2027-03-13", "2027-03-13", "vallelunga", "pistard"), ("2027-05-10", "2027-05-12", "vallelunga", "pistard")])
+        self.assertEqual(ev[0]["price"], "190 €")
+
     def test_racing_factory(self):
         ev = scrape.parse_rf(RF, TODAY)
         self.assertEqual(len(ev), 7)
