@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-25",
+ "checked": "2026-11-26",
  "orgs": {
   "rf": "Racing Factory",
   "gully": "Gully Racing",
@@ -110,7 +110,7 @@
    "status": "ok",
    "count": 7,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "gully",
@@ -119,7 +119,7 @@
    "status": "ok",
    "count": 3,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "promo",
@@ -128,7 +128,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "rosso",
@@ -137,7 +137,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "rehm",
@@ -146,7 +146,7 @@
    "status": "ok",
    "count": 27,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "speer",
@@ -155,16 +155,16 @@
    "status": "ok",
    "count": 51,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "rehm4f",
    "name": "Rehm Race Days (via Racing4Fun)",
    "url": "https://www.racing4fun.de/veranstalter/rehm-race-days/",
    "status": "ok",
-   "count": 12,
+   "count": 11,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "speer4f",
@@ -173,7 +173,7 @@
    "status": "ok",
    "count": 34,
    "message": "",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "cremona",
@@ -182,7 +182,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   },
   {
    "id": "mugello",
@@ -191,7 +191,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-25"
+   "checked": "2026-11-26"
   }
  ],
  "events": [
