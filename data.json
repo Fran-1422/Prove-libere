@@ -8,6 +8,8 @@
   "cremona": "Cremona Circuit",
   "rehm": "Rehm Race Days",
   "speer": "Speer Racing",
+  "vallelunga": "Autodromo di Vallelunga",
+  "pistard": "Pistard Racing",
   "altro": "Altro organizzatore"
  },
  "circuits": [
@@ -24,6 +26,11 @@
   {
    "id": "cremona",
    "name": "Cremona",
+   "country": "IT"
+  },
+  {
+   "id": "vallelunga",
+   "name": "Vallelunga",
    "country": "IT"
   },
   {
@@ -173,6 +180,24 @@
    "status": "ok",
    "count": 34,
    "message": "",
+   "checked": "2026-11-26"
+  },
+  {
+   "id": "pistard",
+   "name": "Pistard Racing (sito ufficiale)",
+   "url": "https://www.pistard-racing.it/prove-libere-moto/",
+   "status": "vuoto",
+   "count": 0,
+   "message": "Nessuna prova libera moto pubblicata.",
+   "checked": "2026-11-26"
+  },
+  {
+   "id": "vallelunga",
+   "name": "Autodromo di Vallelunga (sito ufficiale)",
+   "url": "https://motorsport.vallelunga.it/pl-moto-2/",
+   "status": "vuoto",
+   "count": 0,
+   "message": "Nessuna prova libera moto pubblicata.",
    "checked": "2026-11-26"
   },
   {
