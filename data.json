@@ -107,11 +107,6 @@
    "id": "most",
    "name": "Most",
    "country": "CZ"
-  },
-  {
-   "id": "assicurazionesanitariaspagna",
-   "name": "Assicurazionesanitariaspagna",
-   "country": ""
   }
  ],
  "sources": [
@@ -129,8 +124,8 @@
    "name": "Gully Racing",
    "url": "https://www.gullyracing.it/calendario",
    "status": "ok",
-   "count": 4,
-   "message": "",
+   "count": 3,
+   "message": "Scartate 1 voci che non sono giornate in pista.",
    "checked": "2026-11-27"
   },
   {
@@ -367,19 +362,6 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-siviglia-18-20-febbraio-2027/",
    "src": "rf"
-  },
-  {
-   "id": "gully-assicurazionesanitariaspagna-2027-02-26",
-   "start": "2027-02-26",
-   "end": "2027-03-13",
-   "circuit": "assicurazionesanitariaspagna",
-   "circuit_name": "Assicurazionesanitariaspagna",
-   "country": "",
-   "org": "gully",
-   "price": "75 €",
-   "note": "",
-   "url": "https://www.gullyracing.it/prodotto?id=211",
-   "src": "gully"
   },
   {
    "id": "rehm-cartagena-2027-02-26",
