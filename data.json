@@ -1,5 +1,5 @@
 {
- "checked": "2026-11-26",
+ "checked": "2026-11-27",
  "orgs": {
   "rf": "Racing Factory",
   "gully": "Gully Racing",
@@ -107,6 +107,11 @@
    "id": "most",
    "name": "Most",
    "country": "CZ"
+  },
+  {
+   "id": "assicurazionesanitariaspagna",
+   "name": "Assicurazionesanitariaspagna",
+   "country": ""
   }
  ],
  "sources": [
@@ -117,16 +122,16 @@
    "status": "ok",
    "count": 7,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "gully",
    "name": "Gully Racing",
    "url": "https://www.gullyracing.it/calendario",
    "status": "ok",
-   "count": 3,
+   "count": 4,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "promo",
@@ -135,7 +140,7 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "rosso",
@@ -144,16 +149,16 @@
    "status": "ok",
    "count": 2,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "rehm",
    "name": "Rehm Race Days (sito ufficiale)",
    "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
    "status": "ok",
-   "count": 27,
+   "count": 26,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "speer",
@@ -162,7 +167,7 @@
    "status": "ok",
    "count": 51,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "rehm4f",
@@ -171,7 +176,7 @@
    "status": "ok",
    "count": 11,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "speer4f",
@@ -180,7 +185,7 @@
    "status": "ok",
    "count": 34,
    "message": "",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "pistard",
@@ -189,7 +194,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "vallelunga",
@@ -198,7 +203,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "cremona",
@@ -207,7 +212,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   },
   {
    "id": "mugello",
@@ -216,7 +221,7 @@
    "status": "vuoto",
    "count": 0,
    "message": "Nessuna prova libera moto pubblicata.",
-   "checked": "2026-11-26"
+   "checked": "2026-11-27"
   }
  ],
  "events": [
@@ -228,7 +233,7 @@
    "circuit_name": "Barcellona",
    "country": "ES",
    "org": "rehm",
-   "price": "da 640 €",
+   "price": "",
    "note": "",
    "url": "https://www.rehmracedays.com/it/rehm-race-calendario/",
    "src": "rehm"
@@ -362,6 +367,19 @@
    "note": "",
    "url": "https://www.racingfactory.it/prodotto/prove-libere-siviglia-18-20-febbraio-2027/",
    "src": "rf"
+  },
+  {
+   "id": "gully-assicurazionesanitariaspagna-2027-02-26",
+   "start": "2027-02-26",
+   "end": "2027-03-13",
+   "circuit": "assicurazionesanitariaspagna",
+   "circuit_name": "Assicurazionesanitariaspagna",
+   "country": "",
+   "org": "gully",
+   "price": "75 €",
+   "note": "",
+   "url": "https://www.gullyracing.it/prodotto?id=211",
+   "src": "gully"
   },
   {
    "id": "rehm-cartagena-2027-02-26",
