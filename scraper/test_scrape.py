@@ -279,6 +279,12 @@ class Parsers(unittest.TestCase):
 
 
 class Raccolta(unittest.TestCase):
+    def test_scarta_prodotti_non_prove(self):
+        ev = scrape.event("gully", dt.date(2027, 2, 26), dt.date(2027, 3, 13), scrape.canon("assicurazionesanitariaspagna"), "75 €", "", "https://www.gullyracing.it/prodotto?id=211")
+        self.assertFalse(scrape.looks_like_trackday(ev))
+        ok = scrape.event("gully", dt.date(2027, 2, 26), dt.date(2027, 2, 28), scrape.canon("valencia"), "759 €", "", "https://www.gullyracing.it/prodotto?id=1")
+        self.assertTrue(scrape.looks_like_trackday(ok))
+
     def test_tutto_ok(self):
         r = scrape.collect(TODAY, fake(full()))
         self.assertEqual(len(r["events"]), 34)

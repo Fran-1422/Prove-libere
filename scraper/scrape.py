@@ -46,6 +46,8 @@ CIRCUITS = [
     ("brno", "Brno", "CZ", ["brno", "brunn", "bruenn"]),
     ("rijeka", "Rijeka", "HR", ["rijeka"]),
     ("monteblanco", "Monteblanco", "ES", ["monteblanco"]),
+    ("imola", "Imola", "IT", ["imola"]),
+    ("tazio-nuvolari", "Tazio Nuvolari", "IT", ["tazio nuvolari", "nuvolari"]),
     ("anneau-du-rhin", "Anneau du Rhin", "FR", ["anneau du rhin", "anneau-du-rhin"]),
     ("hockenheim", "Hockenheim", "DE", ["hockenheim"]),
     ("assen", "Assen", "NL", ["assen"]),
@@ -53,6 +55,20 @@ CIRCUITS = [
     ("most", "Most", "CZ", ["most"]),
     ("ledenon", "Ledenon", "FR", ["ledenon"]),
 ]
+# Voci dei negozi che non sono giornate in pista (assicurazioni, noleggi, buoni, corsi...).
+NOT_TRACKDAY = re.compile(
+    r"assicuraz|sanitari|polizza|insurance|noleggi|rental|buono|voucher|gift|regalo|tessera|"
+    r"hotel|alloggi|transfer|trasport|spedizion|merchandis|abbigliament|gadget|foto|video|"
+    r"cena|pranzo|ristorant|corso|coaching|school|scuola|abbonament|caparra|acconto|saldo|"
+    r"officina|gomme|pneumatic|ricambi|carburante|accessor", re.I)
+
+
+def looks_like_trackday(e):
+    """Vero se la voce sembra una vera giornata in pista e non un altro prodotto del negozio."""
+    probe = " ".join(fold(str(e.get(k, ""))) for k in ("circuit", "circuit_name", "note")) + " " + fold(str(e.get("url", "")).rsplit("/", 1)[-1])
+    return not NOT_TRACKDAY.search(probe)
+
+
 ALWAYS_SHOW = ["mugello", "misano", "cremona", "vallelunga"]
 
 ORGS = {
@@ -727,6 +743,8 @@ def collect(today, fetcher=fetch, previous=None):
             error = "%s: %s" % (type(ex).__name__, ex)
 
         found = [e for e in found if e["end"] >= today.isoformat()]
+        scartate = [e for e in found if not looks_like_trackday(e)]
+        found = [e for e in found if looks_like_trackday(e)]
         for e in found:
             e["src"] = s["id"]
         old = [e for e in prev_by_source.get(s["id"], []) if e["end"] >= today.isoformat()]
@@ -738,7 +756,7 @@ def collect(today, fetcher=fetch, previous=None):
         elif not found:
             status, msg, keep = "vuoto", "Nessuna prova libera moto pubblicata.", []
         else:
-            status, msg, keep = "ok", "", found
+            status, msg, keep = "ok", ("Scartate %d voci che non sono giornate in pista." % len(scartate) if scartate else ""), found
         events.extend(keep)
         statuses.append({"id": s["id"], "name": s["name"], "url": s["urls"][0], "status": status,
                          "count": len(keep), "message": msg, "checked": today.isoformat()})
